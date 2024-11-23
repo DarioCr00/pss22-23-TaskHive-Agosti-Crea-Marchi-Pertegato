@@ -27,6 +27,13 @@ dependencies {
 
     implementation 'org.openjfx:javafx-controls:23'
     implementation 'org.openjfx:javafx-fxml:23'
+
+    implementation 'org.hibernate:hibernate-core:6.3.1.Final' // Versione di Hibernate
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0' // API JPA
+    implementation 'org.slf4j:slf4j-api:2.0.9' // Logger per Hibernate
+    runtimeOnly 'mysql:mysql-connector-java:8.0.33' //database SQL
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0' // Test
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
