@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.taskhive.controllers.NotificationViewController" spacing="10" alignment="CENTER">
+    <Label text="Notifiche" style="-fx-font-size: 20px;" />
+    <ListView fx:id="notificationList" />
+    <Button text="Segna come lette" fx:id="markReadButton" />
+</VBox>
