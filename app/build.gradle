@@ -45,17 +45,17 @@ java {
 
 javafx {
     version = "23.0.1"
-    modules = [ 'javafx.controls' ]
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
 application {
     // Define the main class for the application.
     mainClass = 'it.unibo.taskhive.App'
 
-    /*applicationDefaultJvmArgs = [
-        '--module-path', System.getenv("PATH_TO_FX"),
+    applicationDefaultJvmArgs = [
+        '--module-path', "C:/Program Files/Java/javafx-sdk-23.0.1/lib",
         '--add-modules', 'javafx.controls,javafx.fxml'
-    ]*/
+    ]
 }
 
 tasks.named('test') {

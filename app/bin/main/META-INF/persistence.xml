@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
+             version="3.1">
+    <persistence-unit name="taskhivePU" transaction-type="RESOURCE_LOCAL">
+        
+        <!-- Aggiungi tutte le entità qui -->
+        <class>it.unibo.taskhive.models.Task</class>
+        <class>it.unibo.taskhive.models.User</class>
+        <class>it.unibo.taskhive.models.Notification</class>
+
+        <!-- Proprietà specifiche del database -->
+        <properties>
+            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/taskhive?useSSL=false&amp;serverTimezone=UTC" />
+            <property name="jakarta.persistence.jdbc.user" value="root" />
+            <property name="jakarta.persistence.jdbc.password" value="pss2022" />
+
+            <!-- Configurazioni Hibernate -->
+            <property name="hibernate.hbm2ddl.auto" value="update" /> <!-- Crea e aggiorna le tabelle -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" /> <!-- Dialetto MySQL -->
+            <property name="hibernate.show_sql" value="true" /> <!-- Mostra le query SQL nella console -->
+            <property name="hibernate.format_sql" value="true" /> <!-- Formatta le query SQL -->
+        </properties>
+    </persistence-unit>
+</persistence>

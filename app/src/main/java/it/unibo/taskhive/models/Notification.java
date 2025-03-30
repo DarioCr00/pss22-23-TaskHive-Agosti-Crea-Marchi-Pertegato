@@ -64,6 +64,14 @@ public class Notification {
         return userId;
     }
 
+    public NotificationType getType() {
+        return notificationType;
+    }
+
+    public LocalDateTime getReminderTime() {
+        return reminderTime;
+    }
+
     //Setter per isRead
     public void setRead(boolean isRead) {
         this.isRead = isRead;
@@ -72,5 +80,10 @@ public class Notification {
     //Getter opzionale per isRead
     public boolean isRead(){
         return isRead;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + notificationType + "] " + message + " (Reminder: " + reminderTime + ")";
     }
 }
