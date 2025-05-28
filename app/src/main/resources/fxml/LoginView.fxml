@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.taskhive.controllers.LoginViewController"
+            styleClass="root">
+
+    <!-- Titolo -->
+    <top>
+        <Label text="Login" styleClass="label-login-title" BorderPane.alignment="CENTER"/>
+    </top>
+
+    <!-- Form centrale -->
+    <center>
+        <VBox spacing="25" alignment="CENTER" styleClass="container">
+            <TextField fx:id="usernameField" promptText="Username" maxWidth="400" />
+            <PasswordField fx:id="passwordField" promptText="Password" maxWidth="400" />
+
+            <!-- Pulsanti -->
+            <HBox spacing="30" alignment="CENTER">
+                <Button text="Login" onAction="#handleLogin" styleClass="button" />
+                <Button text="Registrati" onAction="#switchToRegister" styleClass="button" />
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

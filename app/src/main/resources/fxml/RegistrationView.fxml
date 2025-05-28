@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="it.unibo.taskhive.controllers.RegistrationViewController"
+            styleClass="root">
+
+    <!-- Titolo -->
+    <top>
+        <Label text="Registrazione" styleClass="label-title" BorderPane.alignment="CENTER"/>
+    </top>
+
+    <!-- Form centrale -->
+    <center>
+        <VBox spacing="25" alignment="CENTER" styleClass="container">
+            <TextField fx:id="usernameField" promptText="Username" maxWidth="400" />
+            <PasswordField fx:id="passwordField" promptText="Password" maxWidth="400" />
+            <PasswordField fx:id="confirmPasswordField" promptText="Conferma Password" maxWidth="400" />
+
+            <!-- Pulsanti -->
+            <HBox spacing="30" alignment="CENTER">
+                <Button text="Registrati" onAction="#handleRegister" styleClass="button" />
+                <Button text="Indietro" onAction="#switchToLogin" styleClass="button" />
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
