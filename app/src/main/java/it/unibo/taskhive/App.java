@@ -3,10 +3,10 @@
  */
 package it.unibo.taskhive;
 
+import java.io.IOException;
+
+import it.unibo.taskhive.services.SceneManager;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -15,25 +15,14 @@ public class App extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
-        Label welcomeLabel = new Label(getGreeting());
+    public void start(Stage stage) throws IOException {
 
-        // Layout Finestra
-        VBox root = new VBox(welcomeLabel);
-        root.setSpacing(10);
-        root.setStyle("-fx-padding: 20; -fx-alignment: center;");
-
-        // Scena Principale
-        Scene scene = new Scene(root, 400, 200);
-
-        // Configurazione della Finestra
-        primaryStage.setTitle("TaskHive");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        SceneManager.setStage(stage);
+        SceneManager.switchScene("fxml/LoginView.fxml");
 
     }
 
     public static void main(String[] args) {
-        launch(args);
+        launch();
     }
 }
