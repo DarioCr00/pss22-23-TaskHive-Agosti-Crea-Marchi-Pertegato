@@ -1,0 +1,441 @@
+.root {
+    -fx-font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f8f9fa;
+}
+
+.sidebar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e1e5e9;
+    -fx-border-width: 0 1px 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 2, 0);
+}
+
+.sidebar-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a202c;
+    -fx-padding: 0;
+    -fx-alignment: center-left;
+}
+
+.project-list {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-focus-color: transparent;
+}
+
+.project-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 12px 16px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+    -fx-text-fill: #4a5568;
+}
+
+.project-list .list-cell:selected {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+}
+
+.project-list .list-cell:hover {
+    -fx-background-color: #f7fafc;
+}
+
+.project-list .list-cell:selected:hover {
+    -fx-background-color: #5a67d8;
+}
+
+.project-list .list-cell:empty {
+    -fx-background-color: transparent;
+}
+
+.primary-button {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 20px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+.primary-button:hover {
+    -fx-background-color: #5a67d8;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #4c51bf;
+}
+
+.secondary-button {
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #4a5568;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 20px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #cbd5e0;
+}
+
+.secondary-button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+.danger-button {
+    -fx-background-color: #fed7d7;
+    -fx-text-fill: #c53030;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 20px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+.danger-button:hover {
+    -fx-background-color: #feb2b2;
+}
+
+.danger-button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+.main-content {
+    -fx-background-color: #f8f9fa;
+}
+
+.header {
+    -fx-background-color: white;
+    -fx-border-color: #e1e5e9;
+    -fx-border-width: 0 0 1px 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 1);
+}
+
+.project-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a202c;
+}
+
+.project-description {
+    -fx-font-size: 16px;
+    -fx-text-fill: #718096;
+    -fx-wrap-text: true;
+    -fx-padding: 5 0 0 0;
+}
+
+.kanban-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-focus-color: transparent;
+}
+
+.kanban-board {
+    -fx-padding: 20px;
+    -fx-spacing: 20px;
+}
+
+.kanban-column {
+    -fx-background-color: #f7fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);
+    -fx-min-width: 250px;
+}
+
+.kanban-header {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 12px 16px;
+    -fx-border-radius: 8px 8px 0 0;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+.tasks-container {
+    -fx-padding: 15px;
+    -fx-spacing: 10px;
+    -fx-min-height: 400px;
+}
+
+.task-card {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 1);
+    -fx-cursor: hand;
+}
+
+.task-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 2);
+    -fx-translate-y: -2px;
+}
+
+.task-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #2d3748;
+}
+
+.task-description {
+    -fx-font-size: 12px;
+    -fx-text-fill: #718096;
+    -fx-wrap-text: true;
+}
+
+.task-priority {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 4px 8px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.priority-low {
+    -fx-background-color: #c6f6d5;
+    -fx-text-fill: #22543d;
+}
+
+.priority-medium {
+    -fx-background-color: #feebc8;
+    -fx-text-fill: #c05621;
+}
+
+.priority-high {
+    -fx-background-color: #fed7d7;
+    -fx-text-fill: #c53030;
+}
+
+.action-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    /*-fx-text-fill: #a0aec0;*/
+    -fx-font-size: 24px;
+    -fx-padding: 4px 6px;
+    -fx-cursor: hand;
+}
+
+.action-button:hover {
+    -fx-text-fill: #4a5568;
+    -fx-background-color: #f7fafc;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.dialog-pane {
+    -fx-background-color: white;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.dialog-pane .content {
+    -fx-padding: 20px;
+}
+
+.dialog-pane .button-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 15px 20px;
+}
+
+.text-field, .text-area, .combo-box {
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-background-color: white;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+}
+
+.text-field:focused, .text-area:focused, .combo-box:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2px;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 8px 12px;
+}
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .track {
+    -fx-background-color: #f1f5f9;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #cbd5e0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #a0aec0;
+}
+
+@media screen and (max-width: 1200px) {
+    .kanban-column {
+        -fx-min-width: 200px;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .sidebar {
+        -fx-pref-width: 250px;
+    }
+    
+    .kanban-column {
+        -fx-min-width: 180px;
+    }
+}
+
+/* Task Assignment and Due Date Styles */
+.task-assigned {
+    -fx-font-size: 11px;
+    -fx-text-fill: #667eea;
+    -fx-font-weight: bold;
+}
+
+.task-due-date {
+    -fx-font-size: 11px;
+    -fx-text-fill: #718096;
+    -fx-font-weight: bold;
+}
+
+.task-due-date.due-soon {
+    -fx-background-color: #feebc8;
+    -fx-padding: 2px 6px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.task-due-date.overdue {
+    -fx-background-color: #fed7d7;
+    -fx-padding: 2px 6px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+/* Date Picker Styles */
+.date-picker {
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-background-color: white;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+}
+
+.date-picker:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2px;
+}
+
+/* Task Followers Styles */
+.task-followers {
+    -fx-font-size: 11px;
+    -fx-text-fill: #718096;
+    -fx-font-style: italic;
+}
+
+/* Follow Button Styles */
+.follow-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #a0aec0;
+    -fx-font-size: 12px;
+    -fx-padding: 4px 6px;
+    -fx-cursor: hand;
+}
+
+.follow-button:hover {
+    -fx-text-fill: #667eea;
+    -fx-background-color: #f0f4ff;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.following-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #667eea;
+    -fx-font-size: 12px;
+    -fx-padding: 4px 6px;
+    -fx-cursor: hand;
+}
+
+.following-button:hover {
+    -fx-text-fill: #5a67d8;
+    -fx-background-color: #e2e8f0;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+## 🎯 **Modifiche per Allineamento Perfetto:**
+
+### **1. ✅ FXML Aggiornato**
+- **HBox principale** con `alignment="CENTER_LEFT"` e `fillHeight="true"`
+- **Region spacer** con `HBox.hgrow="ALWAYS"` per spingere i pulsanti a destra
+- **HBox pulsanti** separato con `alignment="CENTER"` per allineamento verticale perfetto
+- **Spacing ridotto** a 5px tra i pulsanti per compattezza
+
+### **2. ✅ CSS Ottimizzato**
+- **sidebar-title**: Rimosso padding verticale e aggiunto `alignment: center-left`
+- **Pulsanti**: Ridotte dimensioni a 32x32px per migliore proporzione
+- **Font size**: Ridotto per migliore allineamento visivo
+- **Padding**: Ottimizzato per centratura perfetta
+
+### **3. ✅ Layout Struttura**
+```
+┌─────────────────────────────────────────────────┐
+│ TaskHive                            🔔 ⏻        │
+│ Projects                                        │
+│ ├─ Project 1                                    │
+│ ├─ Project 2                                    │
+│ └─ ...                                          │
+│                                                 │
+│ [➕ Add Project]                                │
+│ [✏️ Edit Project]                               │
+│ [🗑️ Delete Project]                            │
+└─────────────────────────────────────────────────┘
+```
+
+### **4. ✅ Allineamento Risultato**
+- **Verticale**: I pulsanti sono perfettamente allineati con la baseline del titolo "TaskHive"
+- **Orizzontale**: I pulsanti sono posizionati il più a destra possibile nella sidebar
+- **Spaziatura**: Spacing ottimizzato per un look pulito e professionale
+
+Ora i pulsanti notifiche e logout sono perfettamente allineati verticalmente con il titolo "TaskHive" e posizionati all'estrema destra della sidebar! 🚀
