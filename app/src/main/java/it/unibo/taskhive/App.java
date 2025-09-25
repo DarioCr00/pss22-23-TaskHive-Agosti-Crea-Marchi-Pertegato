@@ -4,7 +4,6 @@
 package it.unibo.taskhive;
 
 import java.io.IOException;
-
 import it.unibo.taskhive.services.SceneManager;
 import javafx.application.Application;
 import javafx.stage.Stage;

@@ -12,6 +12,7 @@ public class SceneManager {
 
     public static void setStage(Stage stage) {
         primaryStage = stage;
+        primaryStage.setTitle("TaskHive");
     }
 
     public static void switchScene(String fxmlPath) {
