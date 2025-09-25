@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,9 +19,9 @@ class TaskServiceTest {
     private final TaskService taskService = new TaskService();
 
     private Project createProject() {
-        UUID ownerId = UUID.randomUUID();
+        Long ownerId = new Random().nextLong();
         Project project = new Project("Project", "Description", ownerId, List.of(ownerId));
-        project.setId(UUID.randomUUID());
+        project.setId(new Random().nextLong());
         project.setTasks(null);
         return project;
     }
@@ -44,7 +44,7 @@ class TaskServiceTest {
     void toggleFollowAddsAndRemovesFollower() {
         Project project = createProject();
         Task task = new Task("Title", "Description", TaskStatus.PENDING, TaskPriority.HIGH, null, project, null);
-        UUID followerId = UUID.randomUUID();
+        Long followerId = new Random().nextLong();
 
         boolean added = taskService.toggleFollow(task, followerId);
         assertTrue(added, "First toggle should add the follower");

@@ -2,13 +2,14 @@ package it.unibo.taskhive.models;
 
 public class User {
 
+    private Long id;
     private String username;
     private String passwordHash;
     private Role role;
 
     public User() {}
 
-    public User(String username, String passwordHash, Role role) {
+    public User(Long id, String username, String passwordHash, Role role) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.role = role;
@@ -21,6 +22,7 @@ public class User {
     }
 
     // Getters and setters
+    public Long getId() { return id; }
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 

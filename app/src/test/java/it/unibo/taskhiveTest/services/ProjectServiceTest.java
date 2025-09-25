@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,15 +28,15 @@ class ProjectServiceTest {
     @Test
     void getMembersReturnsOnlyProjectMembers() {
         ProjectService projectService = new ProjectService();
-        Project project = new Project("Project", "Description", UUID.randomUUID(), List.of());
-        UUID memberOne = UUID.randomUUID();
-        UUID memberTwo = UUID.randomUUID();
+        Project project = new Project("Project", "Description", new Random().nextLong(), List.of());
+        Long memberOne = new Random().nextLong();
+        Long memberTwo = new Random().nextLong();
         project.setMembers(List.of(memberOne, memberTwo));
         projectService.addProject(project);
 
         User userOne = new User(memberOne, "Alice", "alice@example.com");
         User userTwo = new User(memberTwo, "Bob", "bob@example.com");
-        User outsider = new User(UUID.randomUUID(), "Charlie", "charlie@example.com");
+        User outsider = new User(new Random().nextLong(), "Charlie", "charlie@example.com");
 
         List<User> members = projectService.getMembers(project, List.of(userOne, outsider, userTwo));
 
@@ -46,7 +46,7 @@ class ProjectServiceTest {
     @Test
     void findByIdReturnsMatchingProject() {
         ProjectService projectService = new ProjectService();
-        Project project = new Project("Project", "Description", UUID.randomUUID(), List.of());
+        Project project = new Project("Project", "Description", new Random().nextLong(), List.of());
         projectService.addProject(project);
 
         Optional<Project> found = projectService.findById(project.getId());
@@ -60,11 +60,11 @@ class ProjectServiceTest {
         ProjectService projectService = new ProjectService();
         TaskService taskService = new TaskService();
         List<User> users = List.of(
-            new User(UUID.randomUUID(), "Alice", "alice@example.com"),
-            new User(UUID.randomUUID(), "Bob", "bob@example.com"),
-            new User(UUID.randomUUID(), "Charlie", "charlie@example.com"),
-            new User(UUID.randomUUID(), "Diana", "diana@example.com"),
-            new User(UUID.randomUUID(), "Edward", "edward@example.com")
+            new User(new Random().nextLong(), "Alice", "alice@example.com"),
+            new User(new Random().nextLong(), "Bob", "bob@example.com"),
+            new User(new Random().nextLong(), "Charlie", "charlie@example.com"),
+            new User(new Random().nextLong(), "Diana", "diana@example.com"),
+            new User(new Random().nextLong(), "Edward", "edward@example.com")
         );
 
         projectService.loadSampleData(users, taskService);

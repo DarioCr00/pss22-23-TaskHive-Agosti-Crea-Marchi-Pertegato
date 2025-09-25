@@ -22,7 +22,7 @@ public class LoginViewController {
 
         boolean user = userService.login(username, password);
         if (user == true) {
-            showAlert("Login riuscito!", "Benvenuto, " + username);
+            SceneManager.switchScene("fxml/ProjectView.fxml");
         } else {
             showAlert("Errore", "Username o password errati");
         }

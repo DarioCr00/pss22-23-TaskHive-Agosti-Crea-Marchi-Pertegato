@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class TaskService {
@@ -18,7 +18,7 @@ public class TaskService {
 
     public void ensureTaskId(Task task) {
         if (task.getId() == null) {
-            task.setId(UUID.randomUUID());
+            task.setId(new Random().nextLong());
         }
     }
 
@@ -49,7 +49,7 @@ public class TaskService {
         }
     }
 
-    public boolean toggleFollow(Task task, UUID userId) {
+    public boolean toggleFollow(Task task, Long userId) {
         if (task == null || userId == null) {
             return false;
         }
@@ -63,7 +63,7 @@ public class TaskService {
         return true;
     }
 
-    public Optional<Task> findTaskById(Project project, UUID taskId) {
+    public Optional<Task> findTaskById(Project project, Long taskId) {
         if (project == null || project.getTasks() == null || taskId == null) {
             return Optional.empty();
         }

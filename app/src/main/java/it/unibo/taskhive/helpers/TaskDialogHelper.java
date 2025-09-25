@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class TaskDialogHelper {
 
@@ -89,7 +88,7 @@ public class TaskDialogHelper {
                 List<User> selectedFollowers = new ArrayList<>(followersListView.getSelectionModel().getSelectedItems());
                 LocalDate dueDate = dueDatePicker.getValue();
 
-                List<UUID> followerIds = selectedFollowers.stream().map(User::getId).toList();
+                List<Long> followerIds = selectedFollowers.stream().map(User::getId).toList();
                 LocalDateTime dueDateTime = dueDate != null ? dueDate.atTime(23, 59, 59) : null;
 
                 return new Task(
@@ -160,7 +159,7 @@ public class TaskDialogHelper {
         followersListView.setPrefHeight(100);
 
         if (task.getFollowers() != null) {
-            for (UUID followerId : task.getFollowers()) {
+            for (Long followerId : task.getFollowers()) {
                 allUsers.stream()
                     .filter(user -> user.getId().equals(followerId))
                     .findFirst()
@@ -178,7 +177,7 @@ public class TaskDialogHelper {
                 List<User> selectedFollowers = new ArrayList<>(followersListView.getSelectionModel().getSelectedItems());
                 LocalDate dueDate = dueDatePicker.getValue();
 
-                List<UUID> followerIds = selectedFollowers.stream().map(User::getId).toList();
+                List<Long> followerIds = selectedFollowers.stream().map(User::getId).toList();
                 LocalDateTime dueDateTime = dueDate != null ? dueDate.atTime(23, 59, 59) : null;
 
                 task.setTitle(titleField.getText());

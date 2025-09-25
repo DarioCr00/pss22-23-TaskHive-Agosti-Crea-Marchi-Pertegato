@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Random;
 
 public class ProjectService {
 
@@ -32,7 +32,7 @@ public class ProjectService {
         }
 
         if (project.getId() == null) {
-            project.setId(UUID.randomUUID());
+            project.setId(new Random().nextLong());
         }
 
         if (project.getTasks() == null) {
@@ -59,7 +59,7 @@ public class ProjectService {
             .toList();
     }
 
-    public Optional<Project> findById(UUID projectId) {
+    public Optional<Project> findById(Long projectId) {
         if (projectId == null) {
             return Optional.empty();
         }
@@ -81,17 +81,17 @@ public class ProjectService {
     }
 
     private Project instantiateProject(ProjectTemplate template, TaskService taskService) {
-        List<UUID> memberIds = new ArrayList<>();
+        List<Long> memberIds = new ArrayList<>();
         for (User member : template.memberUsers()) {
             if (member != null) {
-                UUID memberId = member.getId();
+                Long memberId = member.getId();
                 if (!memberIds.contains(memberId)) {
                     memberIds.add(memberId);
                 }
             }
         }
 
-        UUID ownerId = template.owner().getId();
+        Long ownerId = template.owner().getId();
         if (!memberIds.contains(ownerId)) {
             memberIds.add(ownerId);
         }
@@ -102,7 +102,7 @@ public class ProjectService {
             ownerId,
             memberIds
         );
-        project.setId(UUID.randomUUID());
+        project.setId(new Random().nextLong());
         project.setTasks(new ArrayList<>());
 
         for (TaskTemplate taskTemplate : template.tasks()) {
@@ -269,7 +269,7 @@ public class ProjectService {
         List<User> followers,
         TaskService taskService
     ) {
-        List<UUID> followerIds = followers.stream().map(User::getId).toList();
+        List<Long> followerIds = followers.stream().map(User::getId).toList();
         Task task = new Task(
             title,
             description,

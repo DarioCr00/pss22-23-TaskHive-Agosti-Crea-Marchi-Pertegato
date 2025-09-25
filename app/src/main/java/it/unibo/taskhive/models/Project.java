@@ -3,7 +3,6 @@ package it.unibo.taskhive.models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
@@ -24,7 +23,7 @@ public class Project {
 
     @Id
     @GeneratedValue
-    private UUID id;
+    private Long id;
 
     @Column(nullable = false, length = 100)
     private String name;
@@ -33,7 +32,7 @@ public class Project {
     private String description;
 
     @Column(name = "owner_user_id")
-    private UUID ownerUser;
+    private Long ownerUser;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks;
@@ -41,7 +40,7 @@ public class Project {
     @ElementCollection
     @CollectionTable(name = "project_members", joinColumns = @JoinColumn(name = "project_id"))
     @Column(name = "user_id")
-    private List<UUID> members;
+    private List<Long> members;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -53,13 +52,13 @@ public class Project {
         this.members = new ArrayList<>();
     }
 
-    public Project(String name, String description, List<UUID> members) {
+    public Project(String name, String description, List<Long> members) {
         this.name = name;
         this.description = description;
         this.members = members != null ? new ArrayList<>(members) : new ArrayList<>();
     }
 
-    public Project(String name, String description, UUID ownerUser, List<UUID> members) {
+    public Project(String name, String description, Long ownerUser, List<Long> members) {
         this.name = name;
         this.description = description;
         this.ownerUser = ownerUser;
@@ -80,11 +79,11 @@ public class Project {
         updatedAt = LocalDateTime.now();
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -104,11 +103,11 @@ public class Project {
         this.description = description;
     }
 
-    public UUID getOwnerUser() {
+    public Long getOwnerUser() {
         return ownerUser;
     }
 
-    public void setOwnerUser(UUID ownerUser) {
+    public void setOwnerUser(Long ownerUser) {
         this.ownerUser = ownerUser;
     }
 
@@ -120,11 +119,11 @@ public class Project {
         this.tasks = tasks;
     }
 
-    public List<UUID> getMembers() {
+    public List<Long> getMembers() {
         return members;
     }
 
-    public void setMembers(List<UUID> members) {
+    public void setMembers(List<Long> members) {
         this.members = members != null ? new ArrayList<>(members) : new ArrayList<>();
     }
 
@@ -145,7 +144,7 @@ public class Project {
     }
 
     // Utility methods for managing members
-    public void addMember(UUID memberId) {
+    public void addMember(Long memberId) {
         if (members == null) {
             members = new ArrayList<>();
         }
@@ -154,13 +153,13 @@ public class Project {
         }
     }
 
-    public void removeMember(UUID memberId) {
+    public void removeMember(Long memberId) {
         if (members != null) {
             members.remove(memberId);
         }
     }
 
-    public boolean hasMember(UUID userId) {
+    public boolean hasMember(Long userId) {
         return members != null && members.contains(userId);
     }
 
@@ -168,7 +167,7 @@ public class Project {
         return members != null ? members.size() : 0;
     }
 
-    public boolean isOwner(UUID userId) {
+    public boolean isOwner(Long userId) {
         return ownerUser != null && ownerUser.equals(userId);
     }
 

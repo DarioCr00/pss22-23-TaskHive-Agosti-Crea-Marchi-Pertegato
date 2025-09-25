@@ -3,7 +3,6 @@ package it.unibo.taskhive.models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -25,7 +24,7 @@ public class Task {
 
     @Id
     @GeneratedValue
-    private UUID id;
+    private Long id;
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -42,12 +41,12 @@ public class Task {
     private TaskPriority priority;
 
     @Column(name = "assigned_user_id")
-    private UUID assignedUser;
+    private Long assignedUser;
 
     @ElementCollection
     @CollectionTable(name = "task_followers", joinColumns = @JoinColumn(name = "task_id"))
     @Column(name = "follower_user_id")
-    private List<UUID> followers;
+    private List<Long> followers;
 
     @ManyToOne
     @JoinColumn(name = "project_id")
@@ -66,7 +65,7 @@ public class Task {
     }
 
     public Task(String title, String description, TaskStatus status, TaskPriority priority,
-                UUID assignedUser, Project project, LocalDateTime dueDate) {
+                Long assignedUser, Project project, LocalDateTime dueDate) {
         this.title = title;
         this.description = description;
         this.status = status;
@@ -78,7 +77,7 @@ public class Task {
     }
 
     public Task(String title, String description, TaskStatus status, TaskPriority priority,
-                UUID assignedUser, Project project, LocalDateTime dueDate, List<UUID> followers) {
+                Long assignedUser, Project project, LocalDateTime dueDate, List<Long> followers) {
         this.title = title;
         this.description = description;
         this.status = status;
@@ -103,11 +102,11 @@ public class Task {
         updatedAt = LocalDateTime.now();
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -143,11 +142,11 @@ public class Task {
         this.priority = priority;
     }
 
-    public UUID getAssignedUser() {
+    public Long getAssignedUser() {
         return assignedUser;
     }
 
-    public void setAssignedUser(UUID assignedUser) {
+    public void setAssignedUser(Long assignedUser) {
         this.assignedUser = assignedUser;
     }
 
@@ -183,15 +182,15 @@ public class Task {
         this.updatedAt = updatedAt;
     }
 
-    public List<UUID> getFollowers() {
+    public List<Long> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(List<UUID> followers) {
+    public void setFollowers(List<Long> followers) {
         this.followers = followers != null ? new ArrayList<>(followers) : new ArrayList<>();
     }
 
-    public void addFollower(UUID followerId) {
+    public void addFollower(Long followerId) {
         if (followers == null) {
             followers = new ArrayList<>();
         }
@@ -200,13 +199,13 @@ public class Task {
         }
     }
 
-    public void removeFollower(UUID followerId) {
+    public void removeFollower(Long followerId) {
         if (followers != null) {
             followers.remove(followerId);
         }
     }
 
-    public boolean isFollowedBy(UUID userId) {
+    public boolean isFollowedBy(Long userId) {
         return followers != null && followers.contains(userId);
     }
 

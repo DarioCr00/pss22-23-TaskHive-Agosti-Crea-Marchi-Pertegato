@@ -33,7 +33,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.UUID;
 
 public class ProjectViewController {
 
@@ -165,7 +164,7 @@ public class ProjectViewController {
             boolean success = false;
             if (db.hasString() && selectedProject != null) {
                 try {
-                    UUID taskId = UUID.fromString(db.getString());
+                    Long taskId = Long.parseLong(db.getString());
                     Optional<Task> taskOptional = taskService.findTaskById(selectedProject, taskId);
                     if (taskOptional.isPresent()) {
                         Task task = taskOptional.get();
@@ -195,13 +194,13 @@ public class ProjectViewController {
 
         if (project.getOwnerUser() != null) {
             userService.findById(project.getOwnerUser())
-                .ifPresent(owner -> descriptionText.append("👑 Owner: ").append(owner.getName()).append("\n"));
+                .ifPresent(owner -> descriptionText.append("👑 Owner: ").append(owner.getUsername()).append("\n"));
         }
 
         List<User> members = projectService.getMembers(project, userService.getAllUsers());
         if (!members.isEmpty()) {
             descriptionText.append("👥 Members: ");
-            String names = members.stream().map(User::getName).reduce((a, b) -> a + ", " + b).orElse("");
+            String names = members.stream().map(User::getUsername).reduce((a, b) -> a + ", " + b).orElse("");
             descriptionText.append(names);
         }
 
@@ -279,7 +278,7 @@ public class ProjectViewController {
         if (task.getAssignedUser() != null) {
             assignedLabel = userService.findById(task.getAssignedUser())
                 .map(assigned -> {
-                    Label label = new Label("👤 " + assigned.getName());
+                    Label label = new Label("👤 " + assigned.getUsername());
                     label.getStyleClass().add("task-assigned");
                     return label;
                 })
@@ -343,7 +342,7 @@ public class ProjectViewController {
     }
 
     private Button createFollowButton(Task task) {
-        UUID currentUserId = getCurrentUserId();
+        Long currentUserId = getCurrentUserId();
         boolean isFollowing = task.isFollowedBy(currentUserId);
 
         Button followBtn = new Button(isFollowing ? "🔕" : "🔔");
@@ -364,7 +363,7 @@ public class ProjectViewController {
         return followBtn;
     }
 
-    private UUID getCurrentUserId() {
+    private Long getCurrentUserId() {
         return userService.getCurrentUser().getId();
     }
 

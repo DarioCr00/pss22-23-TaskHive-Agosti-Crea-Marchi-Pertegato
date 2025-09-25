@@ -19,7 +19,6 @@ import javafx.geometry.Insets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class ProjectDialogHelper {
 
@@ -66,7 +65,7 @@ public class ProjectDialogHelper {
             if (dialogButton == createButtonType) {
                 User selectedOwner = ownerCombo.getValue();
                 List<User> selectedMembers = new ArrayList<>(membersListView.getSelectionModel().getSelectedItems());
-                List<UUID> memberIds = selectedMembers.stream().map(User::getId).toList();
+                List<Long> memberIds = selectedMembers.stream().map(User::getId).toList();
 
                 if (selectedOwner != null && !memberIds.contains(selectedOwner.getId())) {
                     memberIds = new ArrayList<>(memberIds);
@@ -117,7 +116,7 @@ public class ProjectDialogHelper {
         membersListView.setPrefHeight(120);
 
         if (project.getMembers() != null) {
-            for (UUID memberId : project.getMembers()) {
+            for (Long memberId : project.getMembers()) {
                 availableUsers.stream()
                     .filter(user -> user.getId().equals(memberId))
                     .findFirst()
@@ -133,7 +132,7 @@ public class ProjectDialogHelper {
             if (dialogButton == saveButtonType) {
                 User selectedOwner = ownerCombo.getValue();
                 List<User> selectedMembers = new ArrayList<>(membersListView.getSelectionModel().getSelectedItems());
-                List<UUID> memberIds = selectedMembers.stream().map(User::getId).toList();
+                List<Long> memberIds = selectedMembers.stream().map(User::getId).toList();
 
                 if (selectedOwner != null && !memberIds.contains(selectedOwner.getId())) {
                     memberIds = new ArrayList<>(memberIds);
