@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.taskhive.controllers.NotificationViewController">
+    
+    <!-- Titolo della view -->
+    <top>
+        <Label text="Notifiche" style="-fx-font-size: 24px; -fx-padding: 10px;" BorderPane.alignment="CENTER" />
+    </top>
+    
+    <!-- Layout centrale con VBox per le notifiche -->
+    <center>
+        <VBox spacing="10" alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+            <!-- Contenitore principale per la colonna di notifiche -->
+            <ScrollPane fitToWidth="true" fitToHeight="true">
+                <VBox fx:id="notificationListViewContainer" spacing="10" alignment="CENTER" style="-fx-padding: 20px;">
+                    <ListView fx:id="notificationListView" maxWidth="800" minWidth="800" />
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+    
+    <!-- Bottone per segnare come lette -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10px;">
+            <Button text="Segna come lette" fx:id="markReadButton" />
+        </HBox>
+    </bottom>
+</BorderPane>

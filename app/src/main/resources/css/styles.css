@@ -428,3 +428,58 @@
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
 }
+
+/* Stile della cella principale */
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 5;
+    -fx-border-color: transparent;
+}
+
+.list-cell:filled:selected, .list-cell:filled:hover {
+    -fx-background-color: #eaeaff;
+    -fx-background-radius: 10;
+}
+
+/* Icona circolare */
+.circle-icon {
+    -fx-background-color: #e0d6ff;
+    -fx-background-radius: 50%;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    -fx-alignment: center;
+    -fx-text-fill: #5e4fa2;
+    -fx-font-size: 18px;
+}
+
+/* Titolo della notifica */
+.notification-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* Dettaglio della notifica */
+.notification-detail {
+    -fx-font-size: 12px;
+    -fx-text-fill: #666666;
+}
+
+#notificationListViewContainer {
+    -fx-background-color: #f8f9fa; /* Colore di sfondo chiaro */
+}
+
+.list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #e0e0e0;
+    -fx-padding: 10px;
+}
+
+.button {
+    -fx-background-color: #6200EE;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 5;
+}
