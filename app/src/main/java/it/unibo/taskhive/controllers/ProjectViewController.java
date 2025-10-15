@@ -9,6 +9,7 @@ import it.unibo.taskhive.models.User;
 import it.unibo.taskhive.services.ProjectService;
 import it.unibo.taskhive.services.TaskService;
 import it.unibo.taskhive.services.UserService;
+import it.unibo.taskhive.services.SessionManager;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -51,6 +52,7 @@ public class ProjectViewController {
     @FXML private ResourceBundle resources;
 
     private final UserService userService = new UserService();
+    private final SessionManager sessionManager = SessionManager.getInstance();
     private final TaskService taskService = new TaskService();
     private final ProjectService projectService = new ProjectService();
 
@@ -364,7 +366,7 @@ public class ProjectViewController {
     }
 
     private Long getCurrentUserId() {
-        return userService.getCurrentUser().getId();
+        return sessionManager.getCurrentUser().getId();
     }
 
     private void setupTaskDragAndDrop(VBox taskCard, Task task) {
