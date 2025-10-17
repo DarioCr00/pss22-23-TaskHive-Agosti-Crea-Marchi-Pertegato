@@ -13,25 +13,42 @@ import javafx.scene.layout.VBox;
 
 import java.time.format.DateTimeFormatter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class NotificationViewController {
 
     @FXML
     private ListView<Notification> notificationListView;
 
-    private final NotificationService notificationService = new NotificationService();
+    private final NotificationService notificationService = NotificationService.getInstance();
+    private static final Logger logger = LoggerFactory.getLogger(NotificationViewController.class);
 
     public void initialize() {
 
-        notificationService.createNotification(1, "Complete your profile to unlock features!", 
+        int currentUserId = 13;
+
+        /*var sessionUser = SessionManager.getInstance().getCurrentUser();
+
+        if(sessionUser == null) {
+            logger.warn("[NotificationViewController] Nessun utente loggato trovato nella sessione.");
+            return;
+        }
+
+        long currentUserId = sessionUser.getId();*/
+        logger.info("[NotificationViewController] Caricamento notifiche per userId={}");
+
+        /*notificationService.createNotification(1, "Complete your profile to unlock features!", 
             it.unibo.taskhive.models.NotificationType.SYSTEM, java.time.LocalDateTime.now().plusDays(1));
         notificationService.createNotification(1, "Your task is due tomorrow!", 
-            it.unibo.taskhive.models.NotificationType.TASK, java.time.LocalDateTime.now().plusHours(12));
+            it.unibo.taskhive.models.NotificationType.REMINDER, java.time.LocalDateTime.now().plusHours(12));
         notificationService.createNotification(1, "Meeting scheduled for today at 3 PM.", 
             it.unibo.taskhive.models.NotificationType.REMINDER, java.time.LocalDateTime.now().plusHours(3));
+        */
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
-        ObservableList<Notification> notifications = FXCollections.observableArrayList(notificationService.getNotificationsByUser(1));
+        ObservableList<Notification> notifications = FXCollections.observableArrayList(notificationService.getNotificationsByUser(currentUserId));
         notificationListView.setItems(notifications);
 
         notificationListView.setCellFactory(listView -> new ListCell<Notification>() {
@@ -63,7 +80,7 @@ public class NotificationViewController {
                     Label titleLabel = new Label(notification.getMessage());
                     titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333;");
 
-                    Label detailLabel = new Label("Scadenza: " + notification.getReminderTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
+                    Label detailLabel = new Label("Data: " + notification.getReminderTime().format(formatter));
                     detailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666666;");
 
                     // Aggiunta dei componenti al layout

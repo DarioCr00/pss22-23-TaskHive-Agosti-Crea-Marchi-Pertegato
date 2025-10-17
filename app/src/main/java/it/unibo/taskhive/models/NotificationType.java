@@ -1,5 +1,10 @@
 package it.unibo.taskhive.models;
 
 public enum NotificationType {
-    TASK, REMINDER, SYSTEM
+    PROJECT_CREATED,
+    PROJECT_UPDATED,
+    TASK_CREATED,
+    TASK_UPDATED,
+    REMINDER, 
+    SYSTEM
 }

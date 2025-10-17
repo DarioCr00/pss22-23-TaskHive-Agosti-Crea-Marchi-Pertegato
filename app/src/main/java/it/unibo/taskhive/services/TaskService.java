@@ -16,13 +16,15 @@ public class TaskService {
 
     private final Comparator<Task> priorityComparator = Comparator.comparingInt(this::priorityOrder);
 
+    private final NotificationService notificationService = NotificationService.getInstance();
+
     public void ensureTaskId(Task task) {
         if (task.getId() == null) {
             task.setId(new Random().nextLong());
         }
     }
 
-    public void addTask(Project project, Task task) {
+    public void addTask(Project project, Task task, Long creatorId) {
         if (project == null || task == null) {
             return;
         }
@@ -34,6 +36,8 @@ public class TaskService {
         ensureTaskId(task);
         task.setProject(project);
         project.getTasks().add(task);
+
+        notificationService.notifyTaskCreated(task, creatorId);
     }
 
     public void deleteTask(Project project, Task task) {

@@ -6,13 +6,17 @@ import it.unibo.taskhive.models.Project;
 import it.unibo.taskhive.models.Task;
 import it.unibo.taskhive.models.TaskStatus;
 import it.unibo.taskhive.models.User;
+import it.unibo.taskhive.services.NotificationService;
 import it.unibo.taskhive.services.ProjectService;
 import it.unibo.taskhive.services.TaskService;
 import it.unibo.taskhive.services.UserService;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -27,7 +31,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
@@ -53,6 +59,7 @@ public class ProjectViewController {
     private final UserService userService = new UserService();
     private final TaskService taskService = new TaskService();
     private final ProjectService projectService = new ProjectService();
+    private final NotificationService notificationService = NotificationService.getInstance();
 
     private ProjectDialogHelper projectDialogHelper;
     private TaskDialogHelper taskDialogHelper;
@@ -89,6 +96,8 @@ public class ProjectViewController {
         } else {
             handleNoProjectsState();
         }
+
+        notificationService.setOnNotificationListener(this::showPopupNotification);
     }
 
     private void setupButtons() {
@@ -97,7 +106,7 @@ public class ProjectViewController {
         deleteProjectButton.setOnAction(e -> deleteProject());
         addTaskButton.setOnAction(e -> showAddTaskDialog());
 
-        notificationButton.setOnAction(e -> showNotifications());
+        notificationButton.setOnAction(e -> openNotificationsView());
         logoutButton.setOnAction(e -> showLogoutPlaceholder());
 
         editProjectButton.setDisable(true);
@@ -364,7 +373,11 @@ public class ProjectViewController {
     }
 
     private Long getCurrentUserId() {
-        return userService.getCurrentUser().getId();
+        var user = userService.getCurrentUser();
+        if (user == null) {
+            return 1L;
+        }
+        return user.getId();
     }
 
     private void setupTaskDragAndDrop(VBox taskCard, Task task) {
@@ -392,7 +405,7 @@ public class ProjectViewController {
                 showErrorAlert("Project name cannot be empty.");
                 return;
             }
-            projectService.addProject(project);
+            projectService.addProject(project, getCurrentUserId());
             projectListView.getSelectionModel().select(project);
             selectProject(project);
         });
@@ -456,7 +469,7 @@ public class ProjectViewController {
 
         Optional<Task> result = taskDialogHelper.showCreateDialog(selectedProject);
         result.ifPresent(task -> {
-            taskService.addTask(selectedProject, task);
+            taskService.addTask(selectedProject, task, getCurrentUserId());
             refreshKanbanBoard();
         });
     }
@@ -523,5 +536,31 @@ public class ProjectViewController {
                 getStyleClass().add("project-list-item");
             }
         }
+    }
+
+    @FXML //momentanea, solo per vedere l'update delle notifiche se viene correttamente inserito all'interno della pagina delle notifiche
+    private void openNotificationsView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/NotificationView.fxml"));
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root, 1920, 1080);
+            
+            Stage stage = (Stage) notificationButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showPopupNotification(String message) {
+        javafx.application.Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("🔔 Notifica");
+            alert.setHeaderText("Nuova Notifica");
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 }
