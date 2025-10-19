@@ -1,5 +1,6 @@
 package it.unibo.taskhive.services;
 
+import it.unibo.taskhive.database.HibernateUtil;
 import it.unibo.taskhive.models.Project;
 import it.unibo.taskhive.models.Task;
 import it.unibo.taskhive.models.TaskPriority;
@@ -7,46 +8,81 @@ import it.unibo.taskhive.models.TaskStatus;
 import it.unibo.taskhive.models.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import java.util.function.Consumer;
 
 public class ProjectService {
 
     private final ObservableList<Project> projects = FXCollections.observableArrayList();
+    private Long lastLoadedUserId;
 
     public ObservableList<Project> getProjects() {
         return projects;
+    }
+
+    public ObservableList<Project> loadProjectsForUser(Long userId) {
+        lastLoadedUserId = userId;
+        projects.setAll(fetchProjects(userId));
+        return projects;
+    }
+
+    public void refreshCachedProjects() {
+        projects.setAll(fetchProjects(lastLoadedUserId));
     }
 
     public boolean isValidName(String name) {
         return name != null && !name.trim().isEmpty();
     }
 
-    public void addProject(Project project) {
+    public Project addProject(Project project) {
         if (project == null) {
-            return;
+            return null;
         }
+        ensureProjectCollections(project);
+        executeInTransaction(session -> session.persist(project));
+        refreshCachedProjects();
+        return findInCache(project.getId()).orElse(project);
+    }
 
-        if (project.getId() == null) {
-            project.setId(new Random().nextLong());
+    public Project updateProject(Project project) {
+        return persistProject(project, true);
+    }
+
+    public Project persistProject(Project project, boolean refreshCache) {
+        if (project == null || project.getId() == null) {
+            return null;
         }
-
-        if (project.getTasks() == null) {
-            project.setTasks(new ArrayList<>());
+        ensureProjectCollections(project);
+        executeInTransaction(session -> session.merge(project));
+        if (refreshCache) {
+            refreshCachedProjects();
+            return findInCache(project.getId()).orElse(project);
         }
-
-        projects.add(project);
+        return project;
     }
 
     public void deleteProject(Project project) {
-        if (project == null) {
+        if (project == null || project.getId() == null) {
             return;
         }
-        projects.remove(project);
+
+        executeInTransaction(session -> {
+            Project managed = session.get(Project.class, project.getId());
+            if (managed != null) {
+                session.remove(managed);
+            }
+        });
+
+        refreshCachedProjects();
     }
 
     public List<User> getMembers(Project project, List<User> availableUsers) {
@@ -64,28 +100,149 @@ public class ProjectService {
             return Optional.empty();
         }
 
+        Optional<Project> cached = findInCache(projectId);
+        if (cached.isPresent()) {
+            return cached;
+        }
+
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Project project = session.get(Project.class, projectId);
+            if (project != null) {
+                initializeAssociations(session, project);
+            }
+            return Optional.ofNullable(project);
+        }
+    }
+
+    public void loadSampleData(List<User> users) {
+        if (!shouldLoadSampleData(users)) {
+            return;
+        }
+
+        executeInTransaction(session -> {
+            List<ProjectTemplate> templates = buildSampleTemplates(users);
+            for (ProjectTemplate template : templates) {
+                Project project = instantiateProject(template);
+                session.persist(project);
+            }
+        });
+
+        refreshCachedProjects();
+    }
+
+    private List<Project> fetchProjects(Long userId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            List<Project> result = session.createQuery(
+                    "SELECT DISTINCT p FROM Project p LEFT JOIN FETCH p.tasks t",
+                    Project.class
+                )
+                .getResultList();
+
+            List<Project> deduplicated = deduplicateById(result);
+            for (Project project : deduplicated) {
+                initializeAssociations(session, project);
+            }
+
+            if (userId == null) {
+                return deduplicated;
+            }
+
+            return deduplicated.stream()
+                .filter(project -> isOwnerOrMember(project, userId))
+                .toList();
+        }
+    }
+
+    private List<Project> deduplicateById(List<Project> projects) {
+        Map<Long, Project> unique = new LinkedHashMap<>();
+        for (Project project : projects) {
+            unique.put(project.getId(), project);
+        }
+        return new ArrayList<>(unique.values());
+    }
+
+    private void initializeAssociations(Session session, Project project) {
+        Hibernate.initialize(project.getMembers());
+        if (project.getMembers() == null) {
+            project.setMembers(new ArrayList<>());
+        }
+
+        Hibernate.initialize(project.getTasks());
+        if (project.getTasks() == null) {
+            project.setTasks(new ArrayList<>());
+        } else {
+            for (Task task : project.getTasks()) {
+                task.setProject(project);
+                Hibernate.initialize(task.getFollowers());
+                if (task.getFollowers() == null) {
+                    task.setFollowers(new ArrayList<>());
+                }
+            }
+        }
+    }
+
+    private boolean isOwnerOrMember(Project project, Long userId) {
+        if (userId == null) {
+            return true;
+        }
+        boolean isOwner = project.getOwnerUser() != null && project.getOwnerUser().equals(userId);
+        boolean isMember = project.getMembers() != null && project.getMembers().contains(userId);
+        return isOwner || isMember;
+    }
+
+    private Optional<Project> findInCache(Long projectId) {
+        if (projectId == null) {
+            return Optional.empty();
+        }
         return projects.stream()
             .filter(project -> projectId.equals(project.getId()))
             .findFirst();
     }
 
-    public void loadSampleData(List<User> users, TaskService taskService) {
-        if (users == null || users.size() < 5 || !projects.isEmpty()) {
-            return;
+    private boolean shouldLoadSampleData(List<User> users) {
+        if (users == null || users.size() < 5) {
+            return false;
         }
+        return !hasAnyProject();
+    }
 
-        List<ProjectTemplate> templates = buildSampleTemplates(users);
-        for (ProjectTemplate template : templates) {
-            projects.add(instantiateProject(template, taskService));
+    private boolean hasAnyProject() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Long count = session.createQuery("SELECT COUNT(p) FROM Project p", Long.class)
+                .uniqueResult();
+            return count != null && count > 0;
         }
     }
 
-    private Project instantiateProject(ProjectTemplate template, TaskService taskService) {
+    private void ensureProjectCollections(Project project) {
+        if (project.getMembers() == null) {
+            project.setMembers(new ArrayList<>());
+        }
+        if (project.getTasks() == null) {
+            project.setTasks(new ArrayList<>());
+        }
+    }
+
+    private void executeInTransaction(Consumer<Session> work) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            work.accept(session);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw new RuntimeException("Failed to execute transaction", e);
+        }
+    }
+
+    private Project instantiateProject(ProjectTemplate template) {
         List<Long> memberIds = new ArrayList<>();
         for (User member : template.memberUsers()) {
             if (member != null) {
                 Long memberId = member.getId();
-                if (!memberIds.contains(memberId)) {
+                if (memberId != null && !memberIds.contains(memberId)) {
                     memberIds.add(memberId);
                 }
             }
@@ -102,7 +259,6 @@ public class ProjectService {
             ownerId,
             memberIds
         );
-        project.setId(new Random().nextLong());
         project.setTasks(new ArrayList<>());
 
         for (TaskTemplate taskTemplate : template.tasks()) {
@@ -114,8 +270,7 @@ public class ProjectService {
                 taskTemplate.assignedUser(),
                 project,
                 taskTemplate.dueDate(),
-                taskTemplate.followers(),
-                taskService
+                taskTemplate.followers()
             );
             project.getTasks().add(task);
         }
@@ -266,11 +421,10 @@ public class ProjectService {
         User assignedUser,
         Project project,
         LocalDateTime dueDate,
-        List<User> followers,
-        TaskService taskService
+        List<User> followers
     ) {
         List<Long> followerIds = followers.stream().map(User::getId).toList();
-        Task task = new Task(
+        return new Task(
             title,
             description,
             status,
@@ -280,8 +434,6 @@ public class ProjectService {
             dueDate,
             followerIds
         );
-        taskService.ensureTaskId(task);
-        return task;
     }
 
     private record ProjectTemplate(

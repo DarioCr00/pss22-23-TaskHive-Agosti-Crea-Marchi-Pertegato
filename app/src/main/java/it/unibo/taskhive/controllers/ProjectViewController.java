@@ -7,6 +7,7 @@ import it.unibo.taskhive.models.Task;
 import it.unibo.taskhive.models.TaskStatus;
 import it.unibo.taskhive.models.User;
 import it.unibo.taskhive.services.ProjectService;
+import it.unibo.taskhive.services.SceneManager;
 import it.unibo.taskhive.services.TaskService;
 import it.unibo.taskhive.services.UserService;
 import it.unibo.taskhive.services.SessionManager;
@@ -72,7 +73,8 @@ public class ProjectViewController {
         projectDialogHelper = new ProjectDialogHelper(userService.getAllUsers());
         taskDialogHelper = new TaskDialogHelper(userService);
 
-        projects = projectService.getProjects();
+        projectService.loadSampleData(userService.getAllUsers());
+        projects = projectService.loadProjectsForUser(getCurrentUserId());
         projectListView.setItems(projects);
         projectListView.setCellFactory(listView -> new ProjectListCell());
         projectListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
@@ -84,10 +86,8 @@ public class ProjectViewController {
         setupButtons();
         setupKanbanBoard();
 
-        projectService.loadSampleData(userService.getAllUsers(), taskService);
         if (!projects.isEmpty()) {
             projectListView.getSelectionModel().selectFirst();
-            selectProject(projects.get(0));
         } else {
             handleNoProjectsState();
         }
@@ -172,6 +172,7 @@ public class ProjectViewController {
                         Task task = taskOptional.get();
                         if (task.getStatus() != status) {
                             taskService.moveTask(task, status);
+                            projectService.persistProject(selectedProject, false);
                             refreshKanbanBoard();
                         }
                         success = true;
@@ -356,6 +357,7 @@ public class ProjectViewController {
 
         followBtn.setOnAction(e -> {
             boolean nowFollowing = taskService.toggleFollow(task, currentUserId);
+            projectService.persistProject(selectedProject, false);
             showInfoAlert(nowFollowing
                 ? "You are now following the task: " + task.getTitle()
                 : "You unfollowed the task: " + task.getTitle());
@@ -367,6 +369,16 @@ public class ProjectViewController {
 
     private Long getCurrentUserId() {
         return sessionManager.getCurrentUser().getId();
+    }
+
+    private void selectProjectById(Long projectId) {
+        if (projectId == null) {
+            return;
+        }
+        projects.stream()
+            .filter(project -> projectId.equals(project.getId()))
+            .findFirst()
+            .ifPresent(project -> projectListView.getSelectionModel().select(project));
     }
 
     private void setupTaskDragAndDrop(VBox taskCard, Task task) {
@@ -394,9 +406,8 @@ public class ProjectViewController {
                 showErrorAlert("Project name cannot be empty.");
                 return;
             }
-            projectService.addProject(project);
-            projectListView.getSelectionModel().select(project);
-            selectProject(project);
+            Project savedProject = projectService.addProject(project);
+            selectProjectById(savedProject != null ? savedProject.getId() : null);
         });
     }
 
@@ -411,8 +422,8 @@ public class ProjectViewController {
                 showErrorAlert("Project name cannot be empty.");
                 return;
             }
-            projectListView.refresh();
-            selectProject(project);
+            Project updatedProject = projectService.updateProject(project);
+            selectProjectById(updatedProject != null ? updatedProject.getId() : null);
         });
     }
 
@@ -459,13 +470,17 @@ public class ProjectViewController {
         Optional<Task> result = taskDialogHelper.showCreateDialog(selectedProject);
         result.ifPresent(task -> {
             taskService.addTask(selectedProject, task);
+            projectService.persistProject(selectedProject, false);
             refreshKanbanBoard();
         });
     }
 
     private void showEditTaskDialog(Task task) {
         Optional<Task> result = taskDialogHelper.showEditDialog(selectedProject, task);
-        result.ifPresent(ignored -> refreshKanbanBoard());
+        result.ifPresent(ignored -> {
+            projectService.persistProject(selectedProject, false);
+            refreshKanbanBoard();
+        });
     }
 
     private void deleteTask(Task task) {
@@ -477,6 +492,7 @@ public class ProjectViewController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             taskService.deleteTask(selectedProject, task);
+            projectService.persistProject(selectedProject, false);
             refreshKanbanBoard();
         }
     }
@@ -506,11 +522,15 @@ public class ProjectViewController {
     }
 
     private void showLogoutPlaceholder() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Logout");
-        alert.setHeaderText("Logout Functionality");
-        alert.setContentText("COMING SOON!");
-        alert.showAndWait();
+        alert.setHeaderText("Are you sure you want to logout?");
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            userService.logout();
+            SceneManager.switchScene("fxml/LoginView.fxml");
+        }
     }
 
     private static class ProjectListCell extends ListCell<Project> {
