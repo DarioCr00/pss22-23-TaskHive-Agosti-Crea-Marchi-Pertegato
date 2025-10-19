@@ -43,8 +43,7 @@ public class TaskDialogHelper {
         List<User> projectMembers = userService.resolveUsers(project.getMembers());
 
         Dialog<Task> dialog = new Dialog<>();
-        dialog.setTitle("Add New Task");
-        dialog.setHeaderText("Create a new task");
+        dialog.setTitle("Add new task");
 
         ButtonType createButtonType = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(createButtonType, ButtonType.CANCEL);

@@ -30,8 +30,7 @@ public class ProjectDialogHelper {
 
     public Optional<Project> showCreateDialog() {
         Dialog<Project> dialog = new Dialog<>();
-        dialog.setTitle("Add New Project");
-        dialog.setHeaderText("Create a new project");
+        dialog.setTitle("Create a new project");
 
         ButtonType createButtonType = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(createButtonType, ButtonType.CANCEL);
@@ -88,8 +87,7 @@ public class ProjectDialogHelper {
         }
 
         Dialog<Project> dialog = new Dialog<>();
-        dialog.setTitle("Edit Project");
-        dialog.setHeaderText("Modify project details");
+        dialog.setTitle("Modify project details");
 
         ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
