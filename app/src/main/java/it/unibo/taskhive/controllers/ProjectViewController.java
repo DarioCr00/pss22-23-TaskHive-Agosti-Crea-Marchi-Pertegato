@@ -422,6 +422,7 @@ public class ProjectViewController {
                 showErrorAlert("Project name cannot be empty.");
                 return;
             }
+            projectService.updateProject(project, getCurrentUserId());
             projectListView.refresh();
             selectProject(project);
         });
@@ -439,7 +440,9 @@ public class ProjectViewController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            projectService.deleteProject(selectedProject);
+
+            Long deleterId = getCurrentUserId();
+            projectService.deleteProject(selectedProject, deleterId);
 
             if (!projects.isEmpty()) {
                 projectListView.getSelectionModel().selectFirst();
@@ -449,7 +452,7 @@ public class ProjectViewController {
                 handleNoProjectsState();
                 clearKanbanBoard();
             }
-        }
+        }  
     }
 
     private void handleNoProjectsState() {
@@ -487,7 +490,10 @@ public class ProjectViewController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            taskService.deleteTask(selectedProject, task);
+
+            Long deleterId = getCurrentUserId();
+            taskService.deleteTask(selectedProject, task, deleterId);
+
             refreshKanbanBoard();
         }
     }

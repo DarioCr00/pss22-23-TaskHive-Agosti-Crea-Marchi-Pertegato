@@ -40,11 +40,23 @@ public class TaskService {
         notificationService.notifyTaskCreated(task, creatorId);
     }
 
-    public void deleteTask(Project project, Task task) {
+    public void updateTask(Project project, Task updatedTask, Long updaterId) {
+        if (project == null || updatedTask == null) {
+            return;
+        }
+
+        //rest of the logic to be implemented here.
+
+        notificationService.notifyTaskUpdated(updatedTask, updaterId);
+    }
+
+    public void deleteTask(Project project, Task task, Long deleterId) {
         if (project == null || task == null || project.getTasks() == null) {
             return;
         }
         project.getTasks().remove(task);
+
+        notificationService.notifyTaskDeleted(task, deleterId);
     }
 
     public void moveTask(Task task, TaskStatus status) {

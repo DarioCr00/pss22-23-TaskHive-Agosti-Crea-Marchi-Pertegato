@@ -106,6 +106,54 @@ public class NotificationService {
         logger.info("[NotificationService] Project creation notifications sent for project='{}'", project.getName());
     }
 
+    public void notifyProjectUpdated(Project project, Long updaterId){
+        logger.info("[NotificationService] Sending 'project updated' notification for project='{}' (updaterId={})", project.getName(), updaterId);
+
+        String message = "Progetto aggiornato: " + project.getName();
+
+        for (Long memberId : project.getMembers()) {
+            logger.debug("[NotificationService] Notifying memberId={}", memberId);
+            createNotification(
+                memberId.intValue(), 
+                message, 
+                NotificationType.PROJECT_UPDATED, 
+                java.time.LocalDateTime.now()
+            );
+        }
+
+        logger.info("[NotificationService] Project update notifications sent for project={}", project.getName());
+    }
+
+    public void notifyProjectDeleted(Project project, Long deleterId){
+        logger.info("[NotificationService] Sending 'project deleted' notification for project='{}' (deleterId={})", project.getName(), deleterId );
+
+        String message = "Il progetto \"" + project.getName() + "\" è stato eliminato.";
+
+        List<Long> recipients = new ArrayList<>();
+
+        if(deleterId != null) {
+            recipients.add(deleterId);
+        }
+
+        if (project.getMembers() != null && !project.getMembers().isEmpty()) {
+            recipients.addAll(project.getMembers());
+        }
+
+        recipients = recipients.stream()
+                .distinct()
+                .toList();
+
+        for (Long memberId : project.getMembers()) {
+            logger.debug("[NotificationService] Notifying memberId={} about project deletion", memberId);
+            createNotification(
+                memberId.intValue(),
+                message,
+                NotificationType.PROJECT_DELETED,
+                java.time.LocalDateTime.now()
+            );
+        }
+    }
+
     public void notifyTaskCreated(Task task, Long creatorId) {
         logger.info("[NotificationService] Sending 'task created'notification for task='{}'(creatorId={})", task.getTitle(), creatorId);
 
@@ -141,6 +189,76 @@ public class NotificationService {
         }
         
         logger.info("[NotificationService] Task creation notifications sent for task='{}'", task.getTitle());
+    }
+
+    public void notifyTaskUpdated(Task task, Long updaterId) {
+        logger.info("[NotificationService] Sending 'task updated' notification for task='{}' (updaterId={})", task.getTitle(), updaterId);
+
+        String message = "Task aggiornato: " + task.getTitle();
+
+        List<Long> recipients = new ArrayList<>();
+
+        if(task.getAssignedUser() != null) {
+            recipients.add(task.getAssignedUser());
+        }
+
+        if(task.getFollowers() != null) {
+            recipients.addAll(task.getFollowers());
+        }
+
+        recipients = recipients.stream()
+                .distinct()
+                .toList();
+
+        for(Long userId : recipients) {
+            logger.debug("[NotificationService] Notifying userId={}", userId);
+            createNotification(
+                userId.intValue(),
+                message,
+                NotificationType.TASK_UPDATED,
+                java.time.LocalDateTime.now()
+            );
+        }
+
+        logger.info("[NotificationService] Task update notifications sent for task='{}'", task.getTitle());
+    }
+
+    public void notifyTaskDeleted(Task task, Long deleterId) {
+        logger.info("[NotificationService] Sending 'task deleted' notification for task='{}' (deleterId={})", task.getTitle(), deleterId);
+
+        String message = "Il task \"" + task.getTitle() + "\" è stato eliminato.";
+
+        List<Long> recipients = new ArrayList<>();
+
+        if(deleterId != null) {
+            recipients.add(deleterId);
+        }
+
+        if(task.getAssignedUser() != null && !task.getAssignedUser().equals(deleterId)) {
+            recipients.add(task.getAssignedUser());
+        }
+
+        if(task.getFollowers() != null) {
+            recipients.addAll(
+                task.getFollowers().stream()
+                    .filter(id -> !id.equals(deleterId))   
+                    .toList()
+            );
+        }
+
+        recipients = recipients.stream().distinct().toList();
+
+        for(Long userId : recipients) {
+            logger.debug("[NotificationService] Notifying userId={} about task deletion", userId);
+            createNotification(
+                userId.intValue(),
+                message,
+                NotificationType.TASK_DELETED,
+                java.time.LocalDateTime.now()
+            );
+        }
+
+        logger.info("[NotificationService] Task deletion notification sent for task='{}'", task.getTitle());
     }
 
     public void setOnNotificationListener(Consumer<String> listener) {

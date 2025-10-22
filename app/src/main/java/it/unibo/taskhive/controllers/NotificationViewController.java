@@ -36,7 +36,7 @@ public class NotificationViewController {
         }
 
         long currentUserId = sessionUser.getId();*/
-        logger.info("[NotificationViewController] Caricamento notifiche per userId={}");
+        logger.info("[NotificationViewController] Caricamento notifiche per userId= {}", currentUserId);
 
         /*notificationService.createNotification(1, "Complete your profile to unlock features!", 
             it.unibo.taskhive.models.NotificationType.SYSTEM, java.time.LocalDateTime.now().plusDays(1));

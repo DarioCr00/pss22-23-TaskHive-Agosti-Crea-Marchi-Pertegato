@@ -52,11 +52,30 @@ public class ProjectService {
         notificationService.notifyProjectCreated(project, creatorId);
     }
 
-    public void deleteProject(Project project) {
+    public void updateProject(Project updatedProject, Long updaterId) {
+        if(updatedProject == null) {
+            return;
+        }
+
+        findById(updatedProject.getId()).ifPresent(projects -> {
+            projects.setName(updatedProject.getName());
+            projects.setDescription(updatedProject.getDescription());
+            projects.setOwnerUser(updatedProject.getOwnerUser());
+            projects.setMembers(updatedProject.getMembers());
+        });
+
+        logger.info("[ProjectService] Project '{}' updated byuserId={}", updatedProject.getName(), updaterId);
+
+        notificationService.notifyProjectUpdated(updatedProject, updaterId);
+    }
+
+    public void deleteProject(Project project, Long deleterId) {
         if (project == null) {
             return;
         }
         projects.remove(project);
+
+        notificationService.notifyProjectDeleted(project, deleterId);
     }
 
     public List<User> getMembers(Project project, List<User> availableUsers) {
