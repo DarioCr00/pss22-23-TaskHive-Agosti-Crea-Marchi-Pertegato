@@ -48,7 +48,13 @@ public class NotificationViewController {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
-        ObservableList<Notification> notifications = FXCollections.observableArrayList(notificationService.getNotificationsByUser(currentUserId));
+        ObservableList<Notification> notifications = FXCollections.observableArrayList(
+            notificationService.getNotificationsByUser(currentUserId)
+                .stream()
+                .filter(n -> !n.isRead()) //mostra solo le non lette
+                .toList()
+        );
+
         notificationListView.setItems(notifications);
 
         notificationListView.setCellFactory(listView -> new ListCell<Notification>() {
@@ -62,45 +68,55 @@ public class NotificationViewController {
                 } else {
                     // Creazione del layout della cella
                     HBox root = new HBox(10);
-                    root.setStyle("-fx-background-color: #f9f4ff; -fx-background-radius: 10; "
-                                + "-fx-padding: 15; -fx-border-color: transparent; "
-                                + "-fx-spacing: 10; -fx-alignment: center-left;");
+                    root.getStyleClass().add("notification-cell");
 
-                    // Aggiunta dell'icona o iniziale
-                    Label iconLabel = new Label("A");
-                    iconLabel.setStyle("-fx-background-color: #e0d6ff; -fx-background-radius: 50%; "
-                                    + "-fx-text-fill: #5e4fa2; -fx-font-size: 18px; "
-                                    + "-fx-alignment: center; -fx-min-width: 30px; -fx-min-height: 30px; "
-                                    + "-fx-max-width: 30px; -fx-max-height: 30px; -fx-padding: 3;");
+                    // Icona circolare con iniziale
+                    Label iconLabel = new Label(
+                        notification.getMessage() != null && !notification.getMessage().isEmpty()
+                            ? notification.getMessage().substring(0, 1).toUpperCase()
+                            : "?"
+                    );
+                    iconLabel.getStyleClass().add("notification-icon");
 
-                    // Contenitore per i testi
+                    // Contenitore per testo
                     VBox textContainer = new VBox(5);
-                    textContainer.setStyle("-fx-alignment: center-left;");
+                    textContainer.getStyleClass().add("notification-text-container");
 
                     Label titleLabel = new Label(notification.getMessage());
-                    titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+                    titleLabel.getStyleClass().add("notification-title");
 
                     Label detailLabel = new Label("Data: " + notification.getReminderTime().format(formatter));
-                    detailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666666;");
+                    detailLabel.getStyleClass().add("notification-detail");
 
-                    // Aggiunta dei componenti al layout
                     textContainer.getChildren().addAll(titleLabel, detailLabel);
                     root.getChildren().addAll(iconLabel, textContainer);
 
-                    // Imposta il contenuto della cella
                     setGraphic(root);
                 }
             }
         });
+
+        // Mostra le notifiche più recenti in cima
+        FXCollections.sort(notificationListView.getItems(),
+                (n1, n2) -> n2.getReminderTime().compareTo(n1.getReminderTime()));
     }
     
 
     @FXML
     private void markSelectedAsRead() {
         Notification selectedNotification = notificationListView.getSelectionModel().getSelectedItem();
+
+
         if (selectedNotification != null) {
+
             notificationService.markAsRead(selectedNotification.getIdNotification());
-            notificationListView.refresh();
+
+            //rimozione della notifica dalla lista UI
+            notificationListView.getItems().remove(selectedNotification);
+
+            logger.info("[NotificationViewController] Notification {} segnata come letta e rimossa dalla lista UI.", selectedNotification.getIdNotification());
+        } else {
+            logger.warn("[NotificationViewController] Nessuna notifica selezionata da segnare come letta.");
         }
     }
 

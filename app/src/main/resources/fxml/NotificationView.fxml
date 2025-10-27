@@ -4,29 +4,30 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.taskhive.controllers.NotificationViewController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.taskhive.controllers.NotificationViewController" style="-fx-background-color: white;" stylesheets="@/css/notification-view.css">
     
     <!-- Titolo della view -->
     <top>
-        <Label text="Notifiche" style="-fx-font-size: 24px; -fx-padding: 10px;" BorderPane.alignment="CENTER" />
+        <Label text="Notifiche" 
+                style="-fx-font-size: 24px; -fx-padding: 20px; -fx-text-fill: #333333;"     
+                BorderPane.alignment="CENTER" />
     </top>
     
     <!-- Layout centrale con VBox per le notifiche -->
     <center>
-        <VBox spacing="10" alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+        <VBox spacing="10" alignment="CENTER" BorderPane.alignment="CENTER" style="-fx-background-color: white; -fx-padding: 20;">
             <!-- Contenitore principale per la colonna di notifiche -->
-            <ScrollPane fitToWidth="true" fitToHeight="true">
-                <VBox fx:id="notificationListViewContainer" spacing="10" alignment="CENTER" style="-fx-padding: 20px;">
-                    <ListView fx:id="notificationListView" maxWidth="800" minWidth="800" />
-                </VBox>
-            </ScrollPane>
+            <ListView fx:id="notificationListView" 
+                      style="-fx-background-color: white; -fx-border-color: transparent;" 
+                      prefWidth="800"/>
         </VBox>
     </center>
     
     <!-- Bottone per segnare come lette -->
     <bottom>
-        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10px;">
-            <Button text="Segna come lette" fx:id="markReadButton" />
+        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10px; -fx-background-color: white;">
+            <Button text="Segna come letta" fx:id="markReadButton" onAction="#markSelectedAsRead" 
+                    style="-fx-background-color: #5e4fa2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 16;"/>
         </HBox>
     </bottom>
 </BorderPane>
