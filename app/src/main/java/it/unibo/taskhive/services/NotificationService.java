@@ -162,6 +162,11 @@ public class NotificationService {
         //Lista destinatari
         List<Long> recipients = new ArrayList<>();
 
+        //Creatore
+        if(creatorId != null) {
+            recipients.add(creatorId);
+        }
+
         //Utente assegnato
         if(task.getAssignedUser() != null) {
             recipients.add(task.getAssignedUser());
@@ -197,6 +202,11 @@ public class NotificationService {
         String message = "Task aggiornato: " + task.getTitle();
 
         List<Long> recipients = new ArrayList<>();
+
+        //Include il modificatore del task
+        if(updaterId != null) {
+            recipients.add(updaterId);
+        }
 
         if(task.getAssignedUser() != null) {
             recipients.add(task.getAssignedUser());

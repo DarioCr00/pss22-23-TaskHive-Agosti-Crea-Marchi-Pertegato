@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.taskhive.controllers.NotificationViewController" style="-fx-background-color: white;" stylesheets="@/css/notification-view.css">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unibo.taskhive.controllers.NotificationViewController" style="-fx-background-color: white;" stylesheets="@/css/notification-view.css" prefHeight="700">
     
     <!-- Titolo della view -->
     <top>
@@ -15,19 +15,24 @@
     
     <!-- Layout centrale con VBox per le notifiche -->
     <center>
-        <VBox spacing="10" alignment="CENTER" BorderPane.alignment="CENTER" style="-fx-background-color: white; -fx-padding: 20;">
-            <!-- Contenitore principale per la colonna di notifiche -->
-            <ListView fx:id="notificationListView" 
-                      style="-fx-background-color: white; -fx-border-color: transparent;" 
-                      prefWidth="800"/>
-        </VBox>
+        <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" vbarPolicy="NEVER" style="-fx-background-color: white;">
+            <content>
+                <VBox spacing="10" alignment="CENTER" BorderPane.alignment="CENTER" style=" -fx-padding: 20;" VBox.vgrow="ALWAYS">
+                    <!-- Contenitore principale per la colonna di notifiche -->
+                    <ListView fx:id="notificationListView" 
+                            style="-fx-background-color: white; -fx-border-color: transparent;" 
+                            maxWidth="800"
+                            VBox.vgrow="ALWAYS"/>                           
+                </VBox>
+            </content>
+        </ScrollPane>    
     </center>
     
     <!-- Bottone per segnare come lette -->
     <bottom>
-        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10px; -fx-background-color: white;">
+        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 20px; -fx-background-color: white;">
             <Button text="Segna come letta" fx:id="markReadButton" onAction="#markSelectedAsRead" 
-                    style="-fx-background-color: #5e4fa2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 16;"/>
+                    style="-fx-background-color: #5e4fa2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20;"/>
         </HBox>
     </bottom>
 </BorderPane>
