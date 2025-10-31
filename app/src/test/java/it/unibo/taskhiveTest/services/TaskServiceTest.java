@@ -31,7 +31,7 @@ class TaskServiceTest {
         Project project = createProject();
         Task task = new Task("Title", "Description", TaskStatus.PENDING, TaskPriority.MEDIUM, null, null, null);
 
-        taskService.addTask(project, task);
+        taskService.addTask(project, task, 1L);
 
         assertNotNull(task.getId(), "Task id should be assigned");
         assertEquals(project, task.getProject(), "Task should be associated with the project");

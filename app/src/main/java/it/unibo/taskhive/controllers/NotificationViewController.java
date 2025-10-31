@@ -36,15 +36,6 @@ public class NotificationViewController {
         }
 
         long currentUserId = sessionUser.getId();*/
-        logger.info("[NotificationViewController] Caricamento notifiche per userId= {}", currentUserId);
-
-        /*notificationService.createNotification(1, "Complete your profile to unlock features!", 
-            it.unibo.taskhive.models.NotificationType.SYSTEM, java.time.LocalDateTime.now().plusDays(1));
-        notificationService.createNotification(1, "Your task is due tomorrow!", 
-            it.unibo.taskhive.models.NotificationType.REMINDER, java.time.LocalDateTime.now().plusHours(12));
-        notificationService.createNotification(1, "Meeting scheduled for today at 3 PM.", 
-            it.unibo.taskhive.models.NotificationType.REMINDER, java.time.LocalDateTime.now().plusHours(3));
-        */
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 

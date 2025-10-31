@@ -39,10 +39,7 @@ public class NotificationService {
         Notification notification = new Notification(userId, message, type, reminderTime);
         notifications.add(notification);
 
-        logger.debug("[NotificationService] Total notifications stored: {}", notifications.size());
-
-        if (onNotificationListener != null) {
-            logger.info("[NotificationService] Triggering UI listener for userId={}", userId);
+        if (onNotificationListener != null) {           
             try {
                 onNotificationListener.accept(message);
             } catch (Exception e) {
@@ -52,17 +49,11 @@ public class NotificationService {
             logger.warn("[NotificationService] No UI listener set — notification will not be displayed in real time.");
         }
 
-        /*if(onNotificationListener != null) {
-            onNotificationListener.accept(message);
-        }*/
-
         return notification;
     }
 
     //Recupero delle notifiche per l'utente
     public List<Notification> getNotificationsByUser(long userId) {
-
-        logger.info("[NotificationService] Fetching notifications for userId={}", userId);
 
         List<Notification> userNotifications = new ArrayList<>();
         for (Notification notification : notifications) {
@@ -71,17 +62,14 @@ public class NotificationService {
             }
         }
 
-        logger.debug("[NotificationService] Found {} notifications for userId={}", userNotifications.size(), userId);
         return userNotifications;
     }
 
     //Marcatura lettura notifica
     public void markAsRead(int notificationId) {
-        logger.info("[NotificationService] Marking notification {} as read", notificationId);
         for (Notification notification : notifications) {
             if (notification.getIdNotification() == notificationId) {
                 notification.setRead(true);
-                logger.debug("[NotificationService] Notification {} marked as read", notificationId);
                 break;
             }
         }
@@ -89,12 +77,9 @@ public class NotificationService {
 
     public void notifyProjectCreated(Project project, Long creatorId) {
 
-        logger.info("[NotificationService] Sending 'project created' notification for project='{}' (creatorId={})", project.getName(), creatorId);
-
         String message = "Nuovo progetto creato: " + project.getName();
 
         for (Long memberId : project.getMembers()) {
-            logger.debug("[NotificationService] Notifying memberId={}", memberId);
             createNotification(
                 memberId.intValue(),
                 message,
@@ -102,12 +87,9 @@ public class NotificationService {
                 java.time.LocalDateTime.now()
             );
         }
-        
-        logger.info("[NotificationService] Project creation notifications sent for project='{}'", project.getName());
     }
 
     public void notifyProjectUpdated(Project project, Long updaterId){
-        logger.info("[NotificationService] Sending 'project updated' notification for project='{}' (updaterId={})", project.getName(), updaterId);
 
         String message = "Progetto aggiornato: " + project.getName();
 
@@ -120,12 +102,9 @@ public class NotificationService {
                 java.time.LocalDateTime.now()
             );
         }
-
-        logger.info("[NotificationService] Project update notifications sent for project={}", project.getName());
     }
 
     public void notifyProjectDeleted(Project project, Long deleterId){
-        logger.info("[NotificationService] Sending 'project deleted' notification for project='{}' (deleterId={})", project.getName(), deleterId );
 
         String message = "Il progetto \"" + project.getName() + "\" è stato eliminato.";
 
@@ -144,7 +123,6 @@ public class NotificationService {
                 .toList();
 
         for (Long memberId : project.getMembers()) {
-            logger.debug("[NotificationService] Notifying memberId={} about project deletion", memberId);
             createNotification(
                 memberId.intValue(),
                 message,
@@ -155,7 +133,6 @@ public class NotificationService {
     }
 
     public void notifyTaskCreated(Task task, Long creatorId) {
-        logger.info("[NotificationService] Sending 'task created'notification for task='{}'(creatorId={})", task.getTitle(), creatorId);
 
         String message = "Nuovo task creato: " + task.getTitle();
 
@@ -184,7 +161,6 @@ public class NotificationService {
 
         //Invio delle notifiche
         for (Long userId : recipients) {
-            logger.debug("[NotificationService] Notifying userId={}", userId);
             createNotification(
                 userId.intValue(),
                 message,
@@ -192,12 +168,9 @@ public class NotificationService {
                 java.time.LocalDateTime.now()
             );
         }
-        
-        logger.info("[NotificationService] Task creation notifications sent for task='{}'", task.getTitle());
     }
 
     public void notifyTaskUpdated(Task task, Long updaterId) {
-        logger.info("[NotificationService] Sending 'task updated' notification for task='{}' (updaterId={})", task.getTitle(), updaterId);
 
         String message = "Task aggiornato: " + task.getTitle();
 
@@ -221,7 +194,6 @@ public class NotificationService {
                 .toList();
 
         for(Long userId : recipients) {
-            logger.debug("[NotificationService] Notifying userId={}", userId);
             createNotification(
                 userId.intValue(),
                 message,
@@ -229,8 +201,6 @@ public class NotificationService {
                 java.time.LocalDateTime.now()
             );
         }
-
-        logger.info("[NotificationService] Task update notifications sent for task='{}'", task.getTitle());
     }
 
     public void notifyTaskDeleted(Task task, Long deleterId) {
@@ -259,7 +229,6 @@ public class NotificationService {
         recipients = recipients.stream().distinct().toList();
 
         for(Long userId : recipients) {
-            logger.debug("[NotificationService] Notifying userId={} about task deletion", userId);
             createNotification(
                 userId.intValue(),
                 message,
@@ -267,8 +236,6 @@ public class NotificationService {
                 java.time.LocalDateTime.now()
             );
         }
-
-        logger.info("[NotificationService] Task deletion notification sent for task='{}'", task.getTitle());
     }
 
     public void setOnNotificationListener(Consumer<String> listener) {

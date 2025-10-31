@@ -24,7 +24,7 @@
                   <Region HBox.hgrow="ALWAYS" />
                   <HBox alignment="CENTER" spacing="5.0">
                      <children>
-                        <Button fx:id="notificationButton" styleClass="notification-button" text="🔔" />
+                        <Button fx:id="notificationButton" styleClass="notification-button" text="🔔" onAction="#openNotificationsView" />
                         <Button fx:id="logoutButton" styleClass="logout-button" text="⏻" />
                      </children>
                   </HBox>

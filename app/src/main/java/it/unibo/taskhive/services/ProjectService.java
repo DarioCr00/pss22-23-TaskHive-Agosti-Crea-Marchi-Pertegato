@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 
 public class ProjectService {
@@ -23,7 +21,6 @@ public class ProjectService {
     private final ObservableList<Project> projects = FXCollections.observableArrayList();
 
     private final NotificationService notificationService = NotificationService.getInstance();
-    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     public ObservableList<Project> getProjects() {
         return projects;
@@ -48,7 +45,6 @@ public class ProjectService {
 
         projects.add(project);
 
-        logger.info("[Notification Trigger] Creating notification for project '{}' (creatorId = {}) ", project.getName(), creatorId);
         notificationService.notifyProjectCreated(project, creatorId);
     }
 
@@ -63,8 +59,6 @@ public class ProjectService {
             projects.setOwnerUser(updatedProject.getOwnerUser());
             projects.setMembers(updatedProject.getMembers());
         });
-
-        logger.info("[ProjectService] Project '{}' updated byuserId={}", updatedProject.getName(), updaterId);
 
         notificationService.notifyProjectUpdated(updatedProject, updaterId);
     }
