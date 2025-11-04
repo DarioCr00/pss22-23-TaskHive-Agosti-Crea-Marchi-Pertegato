@@ -89,3 +89,20 @@
 .button:hover {
     -fx-background-color: #6f5fc0;
 }
+
+
+.back-button {
+    -fx-background-color: #5e4fa2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 20px;
+    -fx-background-radius: 8;
+    -fx-min-width: 45px;
+    -fx-min-height: 40px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+.back-button:hover {
+    -fx-background-color: #6f5fc0;
+}

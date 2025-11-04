@@ -2,6 +2,7 @@ package it.unibo.taskhive.controllers;
 
 import it.unibo.taskhive.models.Notification;
 import it.unibo.taskhive.services.NotificationService;
+import it.unibo.taskhive.services.SceneManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -108,6 +109,15 @@ public class NotificationViewController {
             logger.info("[NotificationViewController] Notification {} segnata come letta e rimossa dalla lista UI.", selectedNotification.getIdNotification());
         } else {
             logger.warn("[NotificationViewController] Nessuna notifica selezionata da segnare come letta.");
+        }
+    }
+
+    @FXML
+    private void goBack() {
+        try{
+            SceneManager.switchScene("fxml/ProjectView.fxml");
+        } catch (Exception e) {
+            logger.error("[NotificationViewController] Errore durante il ritorno alla pagina precedente", e);
         }
     }
 

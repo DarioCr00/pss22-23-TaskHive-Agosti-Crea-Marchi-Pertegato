@@ -8,9 +8,16 @@
     
     <!-- Titolo della view -->
     <top>
-        <Label text="Notifiche" 
-                style="-fx-font-size: 24px; -fx-padding: 20px; -fx-text-fill: #333333;"     
-                BorderPane.alignment="CENTER" />
+        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 20px;">
+            <Button text="⟵"
+                    fx:id="backButton"
+                    onAction="#goBack"
+                    styleClass= "back-button" />
+
+            <Label text="Notifiche" 
+                    style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-padding: 20px; -fx-text-fill: #333333;"     
+                    BorderPane.alignment="CENTER" />
+        </HBox>
     </top>
     
     <!-- Layout centrale con VBox per le notifiche -->

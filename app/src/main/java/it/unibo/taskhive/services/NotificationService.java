@@ -5,6 +5,7 @@ import it.unibo.taskhive.models.NotificationType;
 import it.unibo.taskhive.models.Project;
 import it.unibo.taskhive.models.Task;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -236,6 +237,51 @@ public class NotificationService {
                 java.time.LocalDateTime.now()
             );
         }
+    }
+
+    public void sendDueDateReminders(List<Task> allTasks) {
+        LocalDate today = LocalDate.now();
+
+        for (Task task : allTasks) {
+            if (task.getDueDate() == null) continue;
+
+            LocalDate dueDate = task.getDueDate().toLocalDate();
+            long daysUntilDue = java.time.temporal.ChronoUnit.DAYS.between(today, dueDate);
+
+            //invia un reminder da 7 giorni prima della scadenza fino al giorno stesso
+            if( daysUntilDue >= 0 && daysUntilDue <= 7) {
+                String message;
+                if(daysUntilDue == 0) {
+                    message = "⏰ Il task \""+ task.getTitle() + "\" scade oggi!";
+                } else if(daysUntilDue == 1) {
+                    message = "⚠️ Il task \"" + task.getTitle() + "\" scade domani!";
+                } else {
+                    message = "🔔 Il task \"" + task.getTitle() + "\" scade tra " + daysUntilDue + " giorni.";
+                }
+
+                List<Long> recipients = new ArrayList<>();
+
+                if (task.getAssignedUser() != null)
+                    recipients.add(task.getAssignedUser());
+                if (task.getFollowers() != null)
+                    recipients.addAll(task.getFollowers());
+                
+                recipients = recipients.stream().distinct().toList();
+
+                for(Long userId : recipients) {
+                    createNotification(
+                        userId.intValue(), 
+                        message, 
+                        NotificationType.REMINDER, 
+                        LocalDateTime.now()
+                    );
+                }
+            }
+        }
+    }
+
+    public boolean hasUnreadNotifications() {
+        return notifications.stream().anyMatch(n -> !n.isRead());
     }
 
     public void setOnNotificationListener(Consumer<String> listener) {

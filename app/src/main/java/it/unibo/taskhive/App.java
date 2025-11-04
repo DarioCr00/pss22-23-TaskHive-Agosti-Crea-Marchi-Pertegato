@@ -4,11 +4,23 @@
 package it.unibo.taskhive;
 
 import java.io.IOException;
+
+import it.unibo.taskhive.models.Task;
+import it.unibo.taskhive.services.NotificationService;
 import it.unibo.taskhive.services.SceneManager;
+import it.unibo.taskhive.services.TaskService;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class App extends Application {
+
+    private ScheduledExecutorService scheduler;
+
     public String getGreeting() {
         return "Benvenuti nell'App TaskHive!";
     }
@@ -19,7 +31,35 @@ public class App extends Application {
         SceneManager.setStage(stage);
         SceneManager.switchScene("fxml/LoginView.fxml");
 
+        //startReminderScheduler();
+
     }
+    
+    /* 
+    //esegue un task che controlla giornalmente i task ed invia automaticamente la notifica
+    private void startReminderScheduler() {
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        scheduler.scheduleAtFixedRate(() -> {
+            try{
+                List<Task> allTasks = TaskService.getInstance().getAllTasks();
+                NotificationService.getInstance().sendDueDateReminders(allTasks);
+
+                System.out.println("[ReminderScheduler] Controllo completato: " + allTasks.size() + "task analizzati.");
+            } catch (Exception e) {
+                System.err.println("[ReminderScheduler] Errore durante l'invio dei promemoria: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }, 0, 1, TimeUnit.DAYS); //ogni 24 ore
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if(scheduler != null && scheduler.isShutdown()) {
+            scheduler.shutdownNow();
+        }
+        super.stop();
+    } */
 
     public static void main(String[] args) {
         launch();
