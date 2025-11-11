@@ -83,4 +83,15 @@ public class UserService {
     public void logout() {
         sessionManager.clearSession();
     }
+    public boolean updateUser(User user) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.merge(user);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
