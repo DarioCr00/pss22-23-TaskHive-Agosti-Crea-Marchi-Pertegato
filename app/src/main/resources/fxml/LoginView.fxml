@@ -9,7 +9,7 @@
 
     <!-- Titolo -->
     <top>
-        <Label text="Login" styleClass="label-login-title" BorderPane.alignment="CENTER"/>
+        <Label text="Login" styleClass="label-title" BorderPane.alignment="CENTER"/>
     </top>
 
     <!-- Form centrale -->
