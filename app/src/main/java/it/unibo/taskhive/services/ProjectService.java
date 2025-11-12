@@ -20,10 +20,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+
+
 public class ProjectService {
 
     private final ObservableList<Project> projects = FXCollections.observableArrayList();
     private Long lastLoadedUserId;
+
+    private final NotificationService notificationService = NotificationService.getInstance();
 
     public ObservableList<Project> getProjects() {
         return projects;
@@ -43,17 +47,23 @@ public class ProjectService {
         return name != null && !name.trim().isEmpty();
     }
 
-    public Project addProject(Project project) {
+    public Project addProject(Project project, Long creatorId) {
         if (project == null) {
             return null;
         }
         ensureProjectCollections(project);
         executeInTransaction(session -> session.persist(project));
         refreshCachedProjects();
+
+        notificationService.notifyProjectCreated(project, creatorId);
+
         return findInCache(project.getId()).orElse(project);
     }
 
-    public Project updateProject(Project project) {
+    public Project updateProject(Project project, Long updaterId ) {
+
+        notificationService.notifyProjectUpdated(project, updaterId);
+
         return persistProject(project, true);
     }
 
@@ -70,7 +80,7 @@ public class ProjectService {
         return project;
     }
 
-    public void deleteProject(Project project) {
+    public void deleteProject(Project project, Long deleterId) {
         if (project == null || project.getId() == null) {
             return;
         }
@@ -83,6 +93,8 @@ public class ProjectService {
         });
 
         refreshCachedProjects();
+
+        notificationService.notifyProjectDeleted(project, deleterId);
     }
 
     public List<User> getMembers(Project project, List<User> availableUsers) {

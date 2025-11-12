@@ -473,3 +473,9 @@
     -fx-font-size: 14px;
     -fx-background-radius: 5;
 }
+
+#notificationDot {
+    stroke: white;
+    stroke-width: 1;
+    effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 0);
+}

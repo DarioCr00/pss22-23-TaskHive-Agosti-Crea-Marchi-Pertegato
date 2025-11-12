@@ -2,6 +2,7 @@ package it.unibo.taskhive.controllers;
 
 import it.unibo.taskhive.models.Notification;
 import it.unibo.taskhive.services.NotificationService;
+import it.unibo.taskhive.services.SceneManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,25 +14,39 @@ import javafx.scene.layout.VBox;
 
 import java.time.format.DateTimeFormatter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class NotificationViewController {
 
     @FXML
     private ListView<Notification> notificationListView;
 
-    private final NotificationService notificationService = new NotificationService();
+    private final NotificationService notificationService = NotificationService.getInstance();
+    private static final Logger logger = LoggerFactory.getLogger(NotificationViewController.class);
 
     public void initialize() {
 
-        notificationService.createNotification(1, "Complete your profile to unlock features!", 
-            it.unibo.taskhive.models.NotificationType.SYSTEM, java.time.LocalDateTime.now().plusDays(1));
-        notificationService.createNotification(1, "Your task is due tomorrow!", 
-            it.unibo.taskhive.models.NotificationType.TASK, java.time.LocalDateTime.now().plusHours(12));
-        notificationService.createNotification(1, "Meeting scheduled for today at 3 PM.", 
-            it.unibo.taskhive.models.NotificationType.REMINDER, java.time.LocalDateTime.now().plusHours(3));
+        int currentUserId = 13;
+
+        /*var sessionUser = SessionManager.getInstance().getCurrentUser();
+
+        if(sessionUser == null) {
+            logger.warn("[NotificationViewController] Nessun utente loggato trovato nella sessione.");
+            return;
+        }
+
+        long currentUserId = sessionUser.getId();*/
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
-        ObservableList<Notification> notifications = FXCollections.observableArrayList(notificationService.getNotificationsByUser(1));
+        ObservableList<Notification> notifications = FXCollections.observableArrayList(
+            notificationService.getNotificationsByUser(currentUserId)
+                .stream()
+                .filter(n -> !n.isRead()) //mostra solo le non lette
+                .toList()
+        );
+
         notificationListView.setItems(notifications);
 
         notificationListView.setCellFactory(listView -> new ListCell<Notification>() {
@@ -45,45 +60,64 @@ public class NotificationViewController {
                 } else {
                     // Creazione del layout della cella
                     HBox root = new HBox(10);
-                    root.setStyle("-fx-background-color: #f9f4ff; -fx-background-radius: 10; "
-                                + "-fx-padding: 15; -fx-border-color: transparent; "
-                                + "-fx-spacing: 10; -fx-alignment: center-left;");
+                    root.getStyleClass().add("notification-cell");
 
-                    // Aggiunta dell'icona o iniziale
-                    Label iconLabel = new Label("A");
-                    iconLabel.setStyle("-fx-background-color: #e0d6ff; -fx-background-radius: 50%; "
-                                    + "-fx-text-fill: #5e4fa2; -fx-font-size: 18px; "
-                                    + "-fx-alignment: center; -fx-min-width: 30px; -fx-min-height: 30px; "
-                                    + "-fx-max-width: 30px; -fx-max-height: 30px; -fx-padding: 3;");
+                    // Icona circolare con iniziale
+                    Label iconLabel = new Label(
+                        notification.getMessage() != null && !notification.getMessage().isEmpty()
+                            ? notification.getMessage().substring(0, 1).toUpperCase()
+                            : "?"
+                    );
+                    iconLabel.getStyleClass().add("notification-icon");
 
-                    // Contenitore per i testi
+                    // Contenitore per testo
                     VBox textContainer = new VBox(5);
-                    textContainer.setStyle("-fx-alignment: center-left;");
+                    textContainer.getStyleClass().add("notification-text-container");
 
                     Label titleLabel = new Label(notification.getMessage());
-                    titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+                    titleLabel.getStyleClass().add("notification-title");
 
-                    Label detailLabel = new Label("Scadenza: " + notification.getReminderTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
-                    detailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666666;");
+                    Label detailLabel = new Label("Data: " + notification.getReminderTime().format(formatter));
+                    detailLabel.getStyleClass().add("notification-detail");
 
-                    // Aggiunta dei componenti al layout
                     textContainer.getChildren().addAll(titleLabel, detailLabel);
                     root.getChildren().addAll(iconLabel, textContainer);
 
-                    // Imposta il contenuto della cella
                     setGraphic(root);
                 }
             }
         });
+
+        // Mostra le notifiche più recenti in cima
+        FXCollections.sort(notificationListView.getItems(),
+                (n1, n2) -> n2.getReminderTime().compareTo(n1.getReminderTime()));
     }
     
 
     @FXML
     private void markSelectedAsRead() {
         Notification selectedNotification = notificationListView.getSelectionModel().getSelectedItem();
+
+
         if (selectedNotification != null) {
+
             notificationService.markAsRead(selectedNotification.getIdNotification());
-            notificationListView.refresh();
+
+            //rimozione della notifica dalla lista UI
+            notificationListView.getItems().remove(selectedNotification);
+
+            logger.info("[NotificationViewController] Notification {} segnata come letta e rimossa dalla lista UI.", selectedNotification.getIdNotification());
+        } else {
+            logger.warn("[NotificationViewController] Nessuna notifica selezionata da segnare come letta.");
+        }
+    }
+
+    @FXML
+    private void goBack() {
+        try{
+            SceneManager.switchScene("fxml/ProjectView.fxml");
+        } catch (Exception e) {
+            logger.error("[NotificationViewController] Errore durante il ritorno alla pagina precedente", e);
         }
     }
 

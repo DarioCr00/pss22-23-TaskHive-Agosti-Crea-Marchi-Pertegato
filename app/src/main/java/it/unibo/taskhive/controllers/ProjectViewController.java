@@ -6,15 +6,20 @@ import it.unibo.taskhive.models.Project;
 import it.unibo.taskhive.models.Task;
 import it.unibo.taskhive.models.TaskStatus;
 import it.unibo.taskhive.models.User;
+import it.unibo.taskhive.services.NotificationService;
 import it.unibo.taskhive.services.ProjectService;
 import it.unibo.taskhive.services.SceneManager;
 import it.unibo.taskhive.services.TaskService;
 import it.unibo.taskhive.services.UserService;
 import it.unibo.taskhive.services.SessionManager;
+import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -28,13 +33,21 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ProjectViewController {
 
@@ -49,6 +62,9 @@ public class ProjectViewController {
     @FXML private HBox kanbanBoard;
     @FXML private Button addTaskButton;
 
+    @FXML private Circle notificationDot;
+    @FXML private StackPane notificationIconContainer;
+
     @FXML private URL location;
     @FXML private ResourceBundle resources;
 
@@ -56,6 +72,9 @@ public class ProjectViewController {
     private final SessionManager sessionManager = SessionManager.getInstance();
     private final TaskService taskService = new TaskService();
     private final ProjectService projectService = new ProjectService();
+    private final NotificationService notificationService = NotificationService.getInstance();
+    private FadeTransition blinkAnimation;
+    private ScheduledExecutorService notificationChecker;
 
     private ProjectDialogHelper projectDialogHelper;
     private TaskDialogHelper taskDialogHelper;
@@ -91,6 +110,11 @@ public class ProjectViewController {
         } else {
             handleNoProjectsState();
         }
+
+        notificationService.setOnNotificationListener(this::showPopupNotification);
+        notificationDot.setVisible(false);
+
+        startNotificationChecker();
     }
 
     private void setupButtons() {
@@ -99,7 +123,7 @@ public class ProjectViewController {
         deleteProjectButton.setOnAction(e -> deleteProject());
         addTaskButton.setOnAction(e -> showAddTaskDialog());
 
-        notificationButton.setOnAction(e -> showNotifications());
+        notificationButton.setOnAction(e -> openNotificationsView());
         logoutButton.setOnAction(e -> showLogoutPlaceholder());
 
         editProjectButton.setDisable(true);
@@ -406,7 +430,7 @@ public class ProjectViewController {
                 showErrorAlert("Project name cannot be empty.");
                 return;
             }
-            Project savedProject = projectService.addProject(project);
+            Project savedProject = projectService.addProject(project, getCurrentUserId());
             selectProjectById(savedProject != null ? savedProject.getId() : null);
         });
     }
@@ -422,7 +446,7 @@ public class ProjectViewController {
                 showErrorAlert("Project name cannot be empty.");
                 return;
             }
-            Project updatedProject = projectService.updateProject(project);
+            Project updatedProject = projectService.updateProject(project, getCurrentUserId());
             selectProjectById(updatedProject != null ? updatedProject.getId() : null);
         });
     }
@@ -439,7 +463,9 @@ public class ProjectViewController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            projectService.deleteProject(selectedProject);
+
+            Long deleterId = getCurrentUserId();
+            projectService.deleteProject(selectedProject, deleterId);
 
             if (!projects.isEmpty()) {
                 projectListView.getSelectionModel().selectFirst();
@@ -449,7 +475,7 @@ public class ProjectViewController {
                 handleNoProjectsState();
                 clearKanbanBoard();
             }
-        }
+        }  
     }
 
     private void handleNoProjectsState() {
@@ -469,7 +495,7 @@ public class ProjectViewController {
 
         Optional<Task> result = taskDialogHelper.showCreateDialog(selectedProject);
         result.ifPresent(task -> {
-            taskService.addTask(selectedProject, task);
+            taskService.addTask(selectedProject, task, getCurrentUserId());
             projectService.persistProject(selectedProject, false);
             refreshKanbanBoard();
         });
@@ -491,7 +517,9 @@ public class ProjectViewController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            taskService.deleteTask(selectedProject, task);
+
+            Long deleterId = getCurrentUserId();
+            taskService.deleteTask(selectedProject, task, deleterId);
             projectService.persistProject(selectedProject, false);
             refreshKanbanBoard();
         }
@@ -544,6 +572,76 @@ public class ProjectViewController {
                 setText(project.getName());
                 getStyleClass().add("project-list-item");
             }
+        }
+    }
+
+    @FXML //momentanea, solo per vedere l'update delle notifiche se viene correttamente inserito all'interno della pagina delle notifiche
+    private void openNotificationsView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/NotificationView.fxml"));
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root, 1920, 1080);
+            
+            Stage stage = (Stage) notificationButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showPopupNotification(String message) {
+        javafx.application.Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("🔔 Notifica");
+            alert.setHeaderText("Nuova Notifica");
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
+    }
+
+    private void setNotificationAlert(boolean hasUnreadNotifications) {
+        javafx.application.Platform.runLater(() -> {
+            if (hasUnreadNotifications) {
+                notificationDot.setVisible(true);
+
+                // Se non c’è già un’animazione in corso la crea
+                if (blinkAnimation == null) {
+                    blinkAnimation = new FadeTransition(Duration.seconds(0.8), notificationDot);
+                    blinkAnimation.setFromValue(1.0);
+                    blinkAnimation.setToValue(0.2);
+                    blinkAnimation.setCycleCount(FadeTransition.INDEFINITE);
+                    blinkAnimation.setAutoReverse(true);
+                    blinkAnimation.play();
+                }
+            } else {
+                notificationDot.setVisible(false);
+
+                if (blinkAnimation != null) {
+                    blinkAnimation.stop();
+                    blinkAnimation = null;
+                    notificationDot.setOpacity(1.0); // reset visibilità
+                }
+            }
+        });
+    }
+
+    private void startNotificationChecker() {
+        notificationChecker = Executors.newSingleThreadScheduledExecutor();
+        notificationChecker.scheduleAtFixedRate(() -> {
+            try {
+                boolean hasUnread = notificationService.hasUnreadNotifications(); 
+                setNotificationAlert(hasUnread);
+            } catch (Exception e) {
+                System.err.println("[NotificationChecker] Errore durante il controllo notifiche: " + e.getMessage());
+            }
+        }, 0, 15, TimeUnit.SECONDS);
+    }
+
+    public void stopNotificationChecker() {
+        if (notificationChecker != null && !notificationChecker.isShutdown()) {
+            notificationChecker.shutdownNow();
         }
     }
 }
