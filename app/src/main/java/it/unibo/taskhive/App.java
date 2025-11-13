@@ -8,6 +8,7 @@ import java.io.IOException;
 import it.unibo.taskhive.models.Task;
 import it.unibo.taskhive.services.NotificationService;
 import it.unibo.taskhive.services.SceneManager;
+import it.unibo.taskhive.services.UserService;
 import it.unibo.taskhive.services.TaskService;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -27,7 +28,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-
+        UserService userService = new UserService();
+        userService.createSuperUserIfNotExists();
+        
         SceneManager.setStage(stage);
         SceneManager.switchScene("fxml/LoginView.fxml");
 

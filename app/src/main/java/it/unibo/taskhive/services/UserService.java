@@ -83,4 +83,29 @@ public class UserService {
     public void logout() {
         sessionManager.clearSession();
     }
+    public boolean updateUser(User user) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.merge(user);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public void createSuperUserIfNotExists() {
+        if (findByUsername("super").isEmpty()) {
+            String hashedPassword = BCrypt.hashpw("super123", BCrypt.gensalt(12));
+            User superUser = new User("super", hashedPassword, User.Role.SUPER);
+            
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                Transaction tx = session.beginTransaction();
+                session.persist(superUser);
+                tx.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
