@@ -94,4 +94,18 @@ public class UserService {
             return false;
         }
     }
+    public void createSuperUserIfNotExists() {
+        if (findByUsername("super").isEmpty()) {
+            String hashedPassword = BCrypt.hashpw("super123", BCrypt.gensalt(12));
+            User superUser = new User("super", hashedPassword, User.Role.SUPER);
+            
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                Transaction tx = session.beginTransaction();
+                session.persist(superUser);
+                tx.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
