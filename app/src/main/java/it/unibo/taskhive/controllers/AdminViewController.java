@@ -29,7 +29,9 @@ public class AdminViewController {
 
         users.clear();
         for (User u : userList) {
-            users.add(new UserWrapper(u));
+            if (u.getRole() != User.Role.SUPER) {
+                users.add(new UserWrapper(u));
+            }
         }
 
         userTable.setItems(users);
