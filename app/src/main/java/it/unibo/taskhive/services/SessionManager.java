@@ -35,6 +35,10 @@ public class SessionManager {
         return currentUser != null && currentUser.getRole() == User.Role.ADMIN;
     }
 
+    public boolean isSuper() {
+        return currentUser != null && currentUser.getRole() == User.Role.SUPER;
+    }
+
     public String getCurrentUsername() {
         return currentUser != null ? currentUser.getUsername() : null;
     }
