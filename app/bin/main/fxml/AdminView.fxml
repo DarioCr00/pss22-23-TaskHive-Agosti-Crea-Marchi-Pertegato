@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unibo.taskhive.controllers.AdminViewController"
+      styleClass="root"
+      spacing="20"
+      alignment="TOP_CENTER">
+
+    <Label text="Gestione Utenti" styleClass="label-title"/>
+
+    <!--<Label text="Promuovi o declassa gli utenti a livello di amministratore." styleClass="project-description"/>-->
+
+    <TableView fx:id="userTable" styleClass="project-list" VBox.vgrow="ALWAYS" maxWidth="1200">
+        <columns>
+            <TableColumn text="Username" fx:id="usernameColumn" prefWidth="200"/>
+            <TableColumn text="Ruolo" fx:id="roleColumn" prefWidth="150"/>
+            <TableColumn text="Amministratore" fx:id="adminColumn" prefWidth="150"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="Salva Modifiche" onAction="#saveChanges" styleClass="primary-button"/>
+        <!--<Button text="Indietro" onAction="#goBack" styleClass="secondary-button"/>-->
+    </HBox>
+</VBox>

@@ -17,25 +17,26 @@ public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_notification")
     private int idNotification;
 
-    @Column(nullable = false)
+    @Column(name = "id_user", nullable = false)
     private int userId;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "message", nullable = false, length = 255)
     private String message;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "noti_type", nullable = false)
     private NotificationType notificationType;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "is_read", nullable = false)
     private boolean isRead;
 
-    @Column
+    @Column(name = "reminder_time")
     private LocalDateTime reminderTime;
 
     public Notification() {}
@@ -72,6 +73,14 @@ public class Notification {
         return reminderTime;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     //Setter per isRead
     public void setRead(boolean isRead) {
         this.isRead = isRead;
@@ -80,10 +89,5 @@ public class Notification {
     //Getter opzionale per isRead
     public boolean isRead(){
         return isRead;
-    }
-
-    @Override
-    public String toString() {
-        return "[" + notificationType + "] " + message + " (Reminder: " + reminderTime + ")";
     }
 }

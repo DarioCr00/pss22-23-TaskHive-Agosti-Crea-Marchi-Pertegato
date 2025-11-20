@@ -1,5 +1,6 @@
 package it.unibo.taskhive.services;
 
+import it.unibo.taskhive.dao.NotificationDAO;
 import it.unibo.taskhive.models.Notification;
 import it.unibo.taskhive.models.NotificationType;
 import it.unibo.taskhive.models.Project;
@@ -18,13 +19,12 @@ public class NotificationService {
 
     private static NotificationService instance;
 
-    //simulazione db con una lista
-    private final List<Notification> notifications = new ArrayList<>();
+    private final NotificationDAO dao = new NotificationDAO();
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     //Listener UI per notifiche in tempo reale
-    private Consumer<String> onNotificationListener;
+    private Consumer<Notification> onNotificationListener;
 
     private NotificationService() {}
 
@@ -36,44 +36,25 @@ public class NotificationService {
     }
     
     //Metodo per creare una notifica
-    public Notification createNotification(int userId, String message, NotificationType type, LocalDateTime reminderTime) {
+    public void createNotification(int userId, String message, NotificationType type, LocalDateTime reminderTime) { //prima usava public Notification
         Notification notification = new Notification(userId, message, type, reminderTime);
-        notifications.add(notification);
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setRead(false);
+        dao.save(notification);
 
-        if (onNotificationListener != null) {           
-            try {
-                onNotificationListener.accept(message);
-            } catch (Exception e) {
-                logger.error("[NotificationService] Error while triggering UI listener: {}", e.getMessage(), e);
-            }
-        } else {
-            logger.warn("[NotificationService] No UI listener set — notification will not be displayed in real time.");
+        if (onNotificationListener != null) {
+            onNotificationListener.accept(notification);
         }
-
-        return notification;
     }
 
     //Recupero delle notifiche per l'utente
-    public List<Notification> getNotificationsByUser(long userId) {
-
-        List<Notification> userNotifications = new ArrayList<>();
-        for (Notification notification : notifications) {
-            if (notification.getUserId() == userId) {
-                userNotifications.add(notification);
-            }
-        }
-
-        return userNotifications;
+    public List<Notification> getNotificationsByUser(int userId) {
+        return dao.findByUserId(userId);
     }
 
     //Marcatura lettura notifica
     public void markAsRead(int notificationId) {
-        for (Notification notification : notifications) {
-            if (notification.getIdNotification() == notificationId) {
-                notification.setRead(true);
-                break;
-            }
-        }
+        dao.markAsRead(notificationId);
     }
 
     public void notifyProjectCreated(Project project, Long creatorId) {
@@ -280,12 +261,11 @@ public class NotificationService {
         }
     }
 
-    public boolean hasUnreadNotifications() {
-        return notifications.stream().anyMatch(n -> !n.isRead());
+    public boolean hasUnreadNotifications(int userId) {
+        return dao.hasUnread(userId);
     }
 
-    public void setOnNotificationListener(Consumer<String> listener) {
+    public void setOnNotificationListener(Consumer<Notification> listener) {
         this.onNotificationListener= listener;
-        logger.info("[NotificationService] UI listener registered successfully");
     }
 }

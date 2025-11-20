@@ -2,6 +2,7 @@ package it.unibo.taskhive.controllers;
 
 import it.unibo.taskhive.helpers.ProjectDialogHelper;
 import it.unibo.taskhive.helpers.TaskDialogHelper;
+import it.unibo.taskhive.models.Notification;
 import it.unibo.taskhive.models.Project;
 import it.unibo.taskhive.models.Task;
 import it.unibo.taskhive.models.TaskStatus;
@@ -541,14 +542,6 @@ public class ProjectViewController {
         alert.showAndWait();
     }
 
-    private void showNotifications() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Notifications");
-        alert.setHeaderText("Notifications Functionality");
-        alert.setContentText("COMING SOON!");
-        alert.showAndWait();
-    }
-
     private void showLogoutPlaceholder() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Logout");
@@ -591,12 +584,12 @@ public class ProjectViewController {
         }
     }
 
-    private void showPopupNotification(String message) {
+    private void showPopupNotification(Notification notification) {
         javafx.application.Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("🔔 Notifica");
             alert.setHeaderText("Nuova Notifica");
-            alert.setContentText(message);
+            alert.setContentText(notification.getMessage());
             alert.showAndWait();
         });
     }
@@ -628,10 +621,11 @@ public class ProjectViewController {
     }
 
     private void startNotificationChecker() {
+        int currentUserId = 13; //SessionManager.getInstance().getCurrentUser().getId().intValue();
         notificationChecker = Executors.newSingleThreadScheduledExecutor();
         notificationChecker.scheduleAtFixedRate(() -> {
             try {
-                boolean hasUnread = notificationService.hasUnreadNotifications(); 
+                boolean hasUnread = notificationService.hasUnreadNotifications(currentUserId); 
                 setNotificationAlert(hasUnread);
             } catch (Exception e) {
                 System.err.println("[NotificationChecker] Errore durante il controllo notifiche: " + e.getMessage());
