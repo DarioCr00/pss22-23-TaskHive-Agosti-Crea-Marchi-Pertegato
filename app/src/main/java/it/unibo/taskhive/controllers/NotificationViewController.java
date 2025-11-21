@@ -3,6 +3,7 @@ package it.unibo.taskhive.controllers;
 import it.unibo.taskhive.models.Notification;
 import it.unibo.taskhive.services.NotificationService;
 import it.unibo.taskhive.services.SceneManager;
+import it.unibo.taskhive.services.SessionManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -27,16 +28,14 @@ public class NotificationViewController {
 
     public void initialize() {
 
-        int currentUserId = 13;
-
-        /*var sessionUser = SessionManager.getInstance().getCurrentUser();
+        var sessionUser = SessionManager.getInstance().getCurrentUser();
 
         if(sessionUser == null) {
             logger.warn("[NotificationViewController] Nessun utente loggato trovato nella sessione.");
             return;
         }
 
-        long currentUserId = sessionUser.getId();*/
+        int currentUserId = sessionUser.getId().intValue();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 

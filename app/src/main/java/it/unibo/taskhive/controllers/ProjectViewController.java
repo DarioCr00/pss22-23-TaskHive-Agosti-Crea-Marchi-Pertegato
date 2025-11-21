@@ -112,7 +112,10 @@ public class ProjectViewController {
             handleNoProjectsState();
         }
 
-        notificationService.setOnNotificationListener(this::showPopupNotification);
+        notificationService.setOnNotificationListener(notification -> {
+            showPopupNotification(notification);
+            setNotificationAlert(true);
+        });
         notificationDot.setVisible(false);
 
         startNotificationChecker();
@@ -568,7 +571,7 @@ public class ProjectViewController {
         }
     }
 
-    @FXML //momentanea, solo per vedere l'update delle notifiche se viene correttamente inserito all'interno della pagina delle notifiche
+    @FXML
     private void openNotificationsView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/NotificationView.fxml"));
@@ -621,7 +624,10 @@ public class ProjectViewController {
     }
 
     private void startNotificationChecker() {
-        int currentUserId = 13; //SessionManager.getInstance().getCurrentUser().getId().intValue();
+        var sessionUser = sessionManager.getCurrentUser();
+
+        int currentUserId = sessionUser.getId().intValue();
+
         notificationChecker = Executors.newSingleThreadScheduledExecutor();
         notificationChecker.scheduleAtFixedRate(() -> {
             try {
