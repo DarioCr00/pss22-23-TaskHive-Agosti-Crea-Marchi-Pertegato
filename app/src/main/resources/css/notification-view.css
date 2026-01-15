@@ -1,0 +1,108 @@
+
+
+/* === GLOBAL BACKGROUND === */
+.root, .border-pane, .vbox, .hbox {
+    -fx-background-color: white;
+    -fx-pref-height: infinity;
+}
+
+/* === LIST VIEW === */
+.list-view {
+    -fx-background-color: white;
+    -fx-control-inner-background: white;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.list-view .scroll-bar:vertical,
+.list-view .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-max-width: 0;
+    -fx-pref-width: 0;
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+}
+
+.list-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-padding: 8 12;
+}
+
+.list-cell:empty {
+    -fx-opacity: 0; /* rimuove hover su celle vuote */
+}
+
+/* Notifica selezionata */
+.list-cell:selected .notification-cell {
+    -fx-background-color: #d6c8ff;
+    -fx-border-color: #b6a8f9;
+    -fx-border-radius:10;
+}
+
+/* Hover solo su celle non vuote */
+.list-cell:hover:not(:selected) .notification-cell {
+    -fx-background-color: #d6c8ff;
+}
+
+/* === NOTIFICATION CELL === */
+.notification-cell {
+    -fx-background-color: #f9f4ff;
+    -fx-background-radius: 10;
+    -fx-padding: 12;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+}
+
+.notification-icon {
+    -fx-background-color: #e0d6ff;
+    -fx-background-radius: 50%;
+    -fx-text-fill: #5e4fa2;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    -fx-max-width: 30px;
+    -fx-max-height: 30px;
+}
+
+.notification-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.notification-detail {
+    -fx-font-size: 12px;
+    -fx-text-fill: #666666;
+}
+
+/* === BUTTON === */
+.button {
+    -fx-background-color: #5e4fa2;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-background-color: #6f5fc0;
+}
+
+
+.back-button {
+    -fx-background-color: #5e4fa2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 20px;
+    -fx-background-radius: 8;
+    -fx-min-width: 45px;
+    -fx-min-height: 40px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+.back-button:hover {
+    -fx-background-color: #6f5fc0;
+}

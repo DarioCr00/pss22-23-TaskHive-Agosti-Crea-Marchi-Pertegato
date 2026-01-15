@@ -1,0 +1,271 @@
+package it.unibo.taskhive.services;
+
+import it.unibo.taskhive.dao.NotificationDAO;
+import it.unibo.taskhive.models.Notification;
+import it.unibo.taskhive.models.NotificationType;
+import it.unibo.taskhive.models.Project;
+import it.unibo.taskhive.models.Task;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class NotificationService {
+
+    private static NotificationService instance;
+
+    private final NotificationDAO dao = new NotificationDAO();
+
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+
+    //Listener UI per notifiche in tempo reale
+    private Consumer<Notification> onNotificationListener;
+
+    private NotificationService() {}
+
+    public static NotificationService getInstance() {
+        if(instance == null) {
+            instance = new NotificationService();
+        }
+        return instance;
+    }
+    
+    //Metodo per creare una notifica
+    public void createNotification(int userId, String message, NotificationType type, LocalDateTime reminderTime) { //prima usava public Notification
+        Notification notification = new Notification(userId, message, type, reminderTime);
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setRead(false);
+        dao.save(notification);
+
+        if (onNotificationListener != null) {
+            onNotificationListener.accept(notification);
+        }
+    }
+
+    //Recupero delle notifiche per l'utente
+    public List<Notification> getNotificationsByUser(int userId) {
+        return dao.findByUserId(userId);
+    }
+
+    //Marcatura lettura notifica
+    public void markAsRead(int notificationId) {
+        dao.markAsRead(notificationId);
+    }
+
+    public void notifyProjectCreated(Project project, Long creatorId) {
+
+        String message = "Nuovo progetto creato: " + project.getName();
+
+        for (Long memberId : project.getMembers()) {
+            createNotification(
+                memberId.intValue(),
+                message,
+                NotificationType.PROJECT_CREATED,
+                java.time.LocalDateTime.now()
+            );
+        }
+    }
+
+    public void notifyProjectUpdated(Project project, Long updaterId){
+
+        String message = "Progetto aggiornato: " + project.getName();
+
+        for (Long memberId : project.getMembers()) {
+            logger.debug("[NotificationService] Notifying memberId={}", memberId);
+            createNotification(
+                memberId.intValue(), 
+                message, 
+                NotificationType.PROJECT_UPDATED, 
+                java.time.LocalDateTime.now()
+            );
+        }
+    }
+
+    public void notifyProjectDeleted(Project project, Long deleterId){
+
+        String message = "Il progetto \"" + project.getName() + "\" è stato eliminato.";
+
+        List<Long> recipients = new ArrayList<>();
+
+        if(deleterId != null) {
+            recipients.add(deleterId);
+        }
+
+        if (project.getMembers() != null && !project.getMembers().isEmpty()) {
+            recipients.addAll(project.getMembers());
+        }
+
+        recipients = recipients.stream()
+                .distinct()
+                .toList();
+
+        for (Long memberId : project.getMembers()) {
+            createNotification(
+                memberId.intValue(),
+                message,
+                NotificationType.PROJECT_DELETED,
+                java.time.LocalDateTime.now()
+            );
+        }
+    }
+
+    public void notifyTaskCreated(Task task, Long creatorId) {
+
+        String message = "Nuovo task creato: " + task.getTitle();
+
+        //Lista destinatari
+        List<Long> recipients = new ArrayList<>();
+
+        //Creatore
+        if(creatorId != null) {
+            recipients.add(creatorId);
+        }
+
+        //Utente assegnato
+        if(task.getAssignedUser() != null) {
+            recipients.add(task.getAssignedUser());
+        }
+
+        //Followers (se presenti)
+        if(task.getFollowers() != null) {
+            recipients.addAll(task.getFollowers());
+        }
+
+        //Evita duplicati
+        recipients = recipients.stream()
+            .distinct()
+            .toList();
+
+        //Invio delle notifiche
+        for (Long userId : recipients) {
+            createNotification(
+                userId.intValue(),
+                message,
+                NotificationType.TASK_CREATED,
+                java.time.LocalDateTime.now()
+            );
+        }
+    }
+
+    public void notifyTaskUpdated(Task task, Long updaterId) {
+
+        String message = "Task aggiornato: " + task.getTitle();
+
+        List<Long> recipients = new ArrayList<>();
+
+        //Include il modificatore del task
+        if(updaterId != null) {
+            recipients.add(updaterId);
+        }
+
+        if(task.getAssignedUser() != null) {
+            recipients.add(task.getAssignedUser());
+        }
+
+        if(task.getFollowers() != null) {
+            recipients.addAll(task.getFollowers());
+        }
+
+        recipients = recipients.stream()
+                .distinct()
+                .toList();
+
+        for(Long userId : recipients) {
+            createNotification(
+                userId.intValue(),
+                message,
+                NotificationType.TASK_UPDATED,
+                java.time.LocalDateTime.now()
+            );
+        }
+    }
+
+    public void notifyTaskDeleted(Task task, Long deleterId) {
+        logger.info("[NotificationService] Sending 'task deleted' notification for task='{}' (deleterId={})", task.getTitle(), deleterId);
+
+        String message = "Il task \"" + task.getTitle() + "\" è stato eliminato.";
+
+        List<Long> recipients = new ArrayList<>();
+
+        if(deleterId != null) {
+            recipients.add(deleterId);
+        }
+
+        if(task.getAssignedUser() != null && !task.getAssignedUser().equals(deleterId)) {
+            recipients.add(task.getAssignedUser());
+        }
+
+        if(task.getFollowers() != null) {
+            recipients.addAll(
+                task.getFollowers().stream()
+                    .filter(id -> !id.equals(deleterId))   
+                    .toList()
+            );
+        }
+
+        recipients = recipients.stream().distinct().toList();
+
+        for(Long userId : recipients) {
+            createNotification(
+                userId.intValue(),
+                message,
+                NotificationType.TASK_DELETED,
+                java.time.LocalDateTime.now()
+            );
+        }
+    }
+
+    public void sendDueDateReminders(List<Task> allTasks) {
+        LocalDate today = LocalDate.now();
+
+        for (Task task : allTasks) {
+            if (task.getDueDate() == null) continue;
+
+            LocalDate dueDate = task.getDueDate().toLocalDate();
+            long daysUntilDue = java.time.temporal.ChronoUnit.DAYS.between(today, dueDate);
+
+            //invia un reminder da 7 giorni prima della scadenza fino al giorno stesso
+            if( daysUntilDue >= 0 && daysUntilDue <= 7) {
+                String message;
+                if(daysUntilDue == 0) {
+                    message = "⏰ Il task \""+ task.getTitle() + "\" scade oggi!";
+                } else if(daysUntilDue == 1) {
+                    message = "⚠️ Il task \"" + task.getTitle() + "\" scade domani!";
+                } else {
+                    message = "🔔 Il task \"" + task.getTitle() + "\" scade tra " + daysUntilDue + " giorni.";
+                }
+
+                List<Long> recipients = new ArrayList<>();
+
+                if (task.getAssignedUser() != null)
+                    recipients.add(task.getAssignedUser());
+                if (task.getFollowers() != null)
+                    recipients.addAll(task.getFollowers());
+                
+                recipients = recipients.stream().distinct().toList();
+
+                for(Long userId : recipients) {
+                    createNotification(
+                        userId.intValue(), 
+                        message, 
+                        NotificationType.REMINDER, 
+                        LocalDateTime.now()
+                    );
+                }
+            }
+        }
+    }
+
+    public boolean hasUnreadNotifications(int userId) {
+        return dao.hasUnread(userId);
+    }
+
+    public void setOnNotificationListener(Consumer<Notification> listener) {
+        this.onNotificationListener= listener;
+    }
+}

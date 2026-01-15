@@ -3,37 +3,68 @@
  */
 package it.unibo.taskhive;
 
+import java.io.IOException;
+
+import it.unibo.taskhive.models.Task;
+import it.unibo.taskhive.services.NotificationService;
+import it.unibo.taskhive.services.SceneManager;
+import it.unibo.taskhive.services.UserService;
+import it.unibo.taskhive.services.TaskService;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class App extends Application {
+
+    private ScheduledExecutorService scheduler;
+
     public String getGreeting() {
         return "Benvenuti nell'App TaskHive!";
     }
 
     @Override
-    public void start(Stage primaryStage) {
-        Label welcomeLabel = new Label(getGreeting());
+    public void start(Stage stage) throws IOException {
+        UserService userService = new UserService();
+        userService.createSuperUserIfNotExists();
+        
+        SceneManager.setStage(stage);
+        SceneManager.switchScene("fxml/LoginView.fxml");
 
-        // Layout Finestra
-        VBox root = new VBox(welcomeLabel);
-        root.setSpacing(10);
-        root.setStyle("-fx-padding: 20; -fx-alignment: center;");
-
-        // Scena Principale
-        Scene scene = new Scene(root, 400, 200);
-
-        // Configurazione della Finestra
-        primaryStage.setTitle("TaskHive");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        //startReminderScheduler();
 
     }
+    
+    /* 
+    //esegue un task che controlla giornalmente i task ed invia automaticamente la notifica
+    private void startReminderScheduler() {
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        scheduler.scheduleAtFixedRate(() -> {
+            try{
+                List<Task> allTasks = TaskService.getInstance().getAllTasks();
+                NotificationService.getInstance().sendDueDateReminders(allTasks);
+
+                System.out.println("[ReminderScheduler] Controllo completato: " + allTasks.size() + "task analizzati.");
+            } catch (Exception e) {
+                System.err.println("[ReminderScheduler] Errore durante l'invio dei promemoria: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }, 0, 1, TimeUnit.DAYS); //ogni 24 ore
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if(scheduler != null && scheduler.isShutdown()) {
+            scheduler.shutdownNow();
+        }
+        super.stop();
+    } */
 
     public static void main(String[] args) {
-        launch(args);
+        launch();
     }
 }
