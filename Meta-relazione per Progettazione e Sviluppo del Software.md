@@ -1,8 +1,3 @@
----
-title: Meta-relazione per Progettazione e Sviluppo del Software
-
----
-
 # Meta-relazione per Progettazione e Sviluppo del Software
 
 # Analisi
@@ -427,12 +422,15 @@ private void setNotificationAlert(boolean hasUnreadNotifications) {
         });
     }
 ```
+
 ### Andrea
 
 ### Integrazione di BCrypt e Hibernate per autenticazione sicura
 
 **Dove**: UserService
-**Permalink**: _DA AGGIUNGERE_ 
+
+**Permalink**: https://github.com/DarioCr00/pss22-23-TaskHive-Agosti-Crea-Marchi-Pertegato/blob/c6a910c6acd5379729fde8a9e8b7d5fc559d5354/app/src/main/java/it/unibo/taskhive/services/UserService.java#L17-L34
+
 **Snippet**: 
 
 ```java
@@ -459,7 +457,9 @@ public boolean register(String username, String password) {
 ### Separazione Dati persistenti da logica di visualizzazione
 
 **Dove**: UserWrapper
-**Permalink**: _DA AGGIUNGERE_ 
+
+**Permalink**: https://github.com/DarioCr00/pss22-23-TaskHive-Agosti-Crea-Marchi-Pertegato/blob/c6a910c6acd5379729fde8a9e8b7d5fc559d5354/app/src/main/java/it/unibo/taskhive/models/UserWrapper.java#L5-L39
+
 **Snippet**:
 ```java
 public class UserWrapper {
@@ -498,10 +498,12 @@ public class UserWrapper {
     }
 }
 ```
-### Separazione Dati persistenti da logica di visualizzazione
+### Gestione Singleton dello stato utente con SessionManager
 
 **Dove**: SessionManager
-**Permalink**: _DA AGGIUNGERE_ 
+
+**Permalink**: https://github.com/DarioCr00/pss22-23-TaskHive-Agosti-Crea-Marchi-Pertegato/blob/c6a910c6acd5379729fde8a9e8b7d5fc559d5354/app/src/main/java/it/unibo/taskhive/services/SessionManager.java#L11-L32
+
 **Snippet**:
 
 ```java
