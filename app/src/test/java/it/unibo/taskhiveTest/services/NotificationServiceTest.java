@@ -39,12 +39,10 @@ class NotificationServiceTest {
     void testCreatAndRetrieveNotifications() {
 
         //Creazione delle notifiche per il test
-        @SuppressWarnings("unused")
-        Notification notification1 = notificationService.createNotification(1, "Notifica 1", NotificationType.TASK_UPDATED, LocalDateTime.now());
-        @SuppressWarnings("unused")
-        Notification notification2 = notificationService.createNotification(1, "Notifica 2", NotificationType.REMINDER, LocalDateTime.now());
-        @SuppressWarnings("unused")
-        Notification notification3 = notificationService.createNotification(2, "Notifica 3", NotificationType.SYSTEM, LocalDateTime.now());
+        
+        notificationService.createNotification(1, "Notifica 1", NotificationType.TASK_UPDATED, LocalDateTime.now());
+        notificationService.createNotification(1, "Notifica 2", NotificationType.REMINDER, LocalDateTime.now());
+        notificationService.createNotification(2, "Notifica 3", NotificationType.SYSTEM, LocalDateTime.now());
 
         //Recupero delle notifiche per utente 1
         List<Notification> user1Notifications = notificationService.getNotificationsByUser(1);
@@ -65,13 +63,15 @@ class NotificationServiceTest {
     void testMarkAsReadMarksCorrectNotification() {
 
         //Creazione delle notifiche
-        Notification notification = notificationService.createNotification(1, "Notifica da leggere", NotificationType.TASK_UPDATED, LocalDateTime.now());
+        notificationService.createNotification(1, "Notifica da leggere", NotificationType.TASK_UPDATED, LocalDateTime.now());
+
+        //Recupero delle notifiche
+        List<Notification> user1Notifications = notificationService.getNotificationsByUser(1);
+        Notification notification = user1Notifications.get(0);
 
         //marcatura come letta
         notificationService.markAsRead(notification.getIdNotification());
 
-        //Recupero delle notifiche
-        List<Notification> user1Notifications = notificationService.getNotificationsByUser(1);
         assertEquals(1, user1Notifications.size(), "There should be exactly one notificaition");
         assertTrue(user1Notifications.get(0).isRead(), "Notification should be marked as read");
     }
@@ -84,7 +84,7 @@ class NotificationServiceTest {
 
     @Test
     void testNotificationListenerIsTriggered() {
-        AtomicReference<String> listenerMessage = new AtomicReference<>(null);
+        AtomicReference<Notification> listenerMessage = new AtomicReference<>(null);
         notificationService.setOnNotificationListener(listenerMessage::set);
 
         notificationService.createNotification(7, "Evento in tempo reale", NotificationType.TASK_CREATED, LocalDateTime.now());
