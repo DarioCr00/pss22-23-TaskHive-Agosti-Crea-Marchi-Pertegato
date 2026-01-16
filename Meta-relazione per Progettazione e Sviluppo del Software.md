@@ -132,11 +132,16 @@ classDiagram
 Il progetto segue il pattern **MVC**.
 
 Lato notfiche viene gestita nel seguente modo: 
-- **Model**: rappresentato dalla classe NotificationService, che gestisce la logica delle notifiche.
+- **Model**: rappresentato dall’entità Notification, che modella lo stato delle notifiche persistenti.
 - **View**: rappresentata da NotificationView, che si occupa dell'interfaccia utente.
 - **Controller**: è la logica di coordinamento fra manager ed interfaccia, spesso integrata nella ProjectViewController.
 
 Il sistema utilizza anche il _pattern Observer_, poichè la vista è osservatrice del NotificationService. Quindi, quando vengono aggiunte o rimosse notifiche, la UI viene aggiornata in automatico.
+
+Lato utente il pattern viene utilizzato nel modo seguente:
+- **Model**: rappresentato dalla classe User, che si occupa di fare da manifestazione pratica dell'utente presente nella logica di business.
+- **View**: rappresentata da AdminView, LoginView e RegistrationView, che si occupano di dare all'utente un'intrefaccia semplice al fine di poter svolgere il proprio compito.
+- **Controller**: sono il modo in cui le varie interfacce comunicano con la logica applicativa e con il modello (AdminViewController, LoginViewController e RegistrationViewController)
 
 ```mermaid
 classDiagram
@@ -290,6 +295,61 @@ classDiagram
 ```
 
 ## Design dettagliato
+
+L'applicazione **TaskHive** è un sistema desktop per la gestione di progetti e attività, progettato per supportare utenti con ruoli gerarchici (USER, ADMIN, SUPER) e consentire una collaborazione organizzata attraverso un'interfaccia grafica intuitiva. L’applicazione combina logiche di autenticazione sicura, persistenza locale dei dati e interazione dinamica tramite JavaFX.
+
+I principi fondamentali seguiti per la realizzazione lato utente sono stati i seguenti:
+
+- **Autenticazione Sicura**
+
+    Il sistema implementa un flusso di registrazione e login basato su           hashing delle password tramite BCrypt, garantendo che nessuna password       venga mai memorizzata in chiaro. Le credenziali sono verificate contro       un database locale H2, accessibile solo dopo il corretto inserimento di     username e password.
+
+- **Persistenza dei Dati**
+
+    I dati degli utenti e delle attività sono persistenti grazie a Hibernate     ORM, che si interfaccia con un database embedded H2. Il file                 hibernate.cfg.xml configura la connessione e il mapping delle entità         (User, ecc.), assicurando coerenza e mantenibilità.
+
+- **Gestione della Sessione**
+
+    È stato introdotto un componente centrale: il SessionManager,               implementato come Singleton, per tracciare l’utente attualmente loggato.     Questo permette di:
+
+    - Verificare rapidamente lo stato di accesso
+    - Proteggere schermate sensibili (es. pannello amministratore)
+    - Evitare il passaggio manuale dell’utente tra controller
+    
+- **Interfaccia Grafica Reattiva**
+
+    L’interfaccia è realizzata con JavaFX e FXML, utilizzando stili CSS         personalizzati per uniformità visiva. Schermate come LoginView,             DashboardView e AdminView sono collegate tramite un SceneManager, che       centralizza la navigazione e applica automaticamente fogli di stile         comuni.
+
+- **Autorizzazioni Gerarchiche**
+
+    Il sistema distingue tre ruoli:
+
+    - USER: può visualizzare e partecipare ai progetti
+    - ADMIN: può gestire membri e task
+    - SUPER: può accedere alla pagina di amministrazione per                       promuovere/declassare utenti
+
+- **Gestione Notifiche** 
+        Il sistema integra un meccanismo di notifiche pensato per supportare la collaborazione tra gli utenti e migliorare la consapevolezza degli eventi rilevanti all’interno dell’applicazione, come la creazione, la modifica o l’eliminazione di progetti e task, nonché l’approssimarsi di scadenze.
+
+    Le notifiche sono modellate tramite l’entità Notification, che rappresenta lo stato persistente di ciascun evento notificabile, includendo informazioni quali il destinatario, il messaggio, il tipo di notifica, la data di creazione, l’eventuale data di promemoria e lo stato di lettura.
+
+    La logica applicativa relativa alle notifiche è incapsulata nel componente NotificationService, che si occupa di:
+    - creare nuove notifiche in risposta a eventi di dominio (ad esempio operazioni su progetti o task);
+    - recuperare le notifiche associate a uno specifico utente;
+    - gestire lo stato di lettura delle notifiche;
+    - verificare la presenza di notifiche non lette.
+
+
+L'applicazione permette di creare progetti con task al loro interno, assegnabili a utenti "responsabili" e "subordinati" (admin e user), ognuno dei quali potrà visualizzare l'andamento dei vari task e progetti a cui è assegnato e riceverà notifiche relative al loro svolgimento.
+Ciò si basa su una serie di stati in cui i task possono esistere:
+- **Pending**: Task in attesa di input esterni.
+- **In Progress**: Task in fase di svolgimento, non ancora completato.
+- **Completed**: Task terminato con successo.
+- **Blocked**: Task terminato prematuramente, non concluso.
+
+L'owner del progetto è in grado di creare, cancellare, modificare e spostare i task tra queste fasi di avanzamento.
+
+## Problematiche
 
 ### Gestione notifiche in arrivo
 
